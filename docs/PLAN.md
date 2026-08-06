@@ -12,34 +12,33 @@
 **Objetivo**: Preparar o esqueleto técnico do projeto (Next.js + TypeScript + Tailwind + shadcn/ui) e a estrutura de pastas definida no PRD, pronto para receber telas.
 
 **Entregas**:
-- [ ] Inicializar projeto Next.js 14 (App Router) com TypeScript 5
-- [ ] Configurar Tailwind CSS
-- [ ] Instalar e configurar shadcn/ui (tema base, `components.json`)
-- [ ] Criar estrutura de pastas do PRD (`/app`, `/components/ui`, `/components/kanban`, `/components/leads`, `/components/dashboard`, `/lib/supabase`, `/lib/stripe`, `/lib/email`, `/docs`)
-- [ ] Configurar ESLint + Prettier e scripts de lint/format
-- [ ] Configurar `.env.example` com placeholders (Supabase, Stripe, Resend)
-- [ ] Criar repositório Git, `.gitignore`, README inicial
-- [ ] Configurar deploy de preview na Vercel (projeto vazio funcionando em produção)
+- [x] Inicializar projeto Next.js 14 (App Router) com TypeScript 5
+- [x] Configurar Tailwind CSS
+- [x] Instalar e configurar shadcn/ui (tema base, `components.json`)
+- [x] Criar estrutura de pastas do PRD (`/app`, `/components/ui`, `/components/kanban`, `/components/leads`, `/components/dashboard`, `/lib/supabase`, `/lib/stripe`, `/lib/email`, `/docs`)
+- [x] Configurar ESLint + Prettier e scripts de lint/format
+- [x] Configurar `.env.example` com placeholders (Supabase, Stripe, Resend)
+- [x] Criar repositório Git, `.gitignore`, README inicial
+- [x] Configurar deploy de preview na Vercel (projeto vazio funcionando em produção)
 
 **Commit final**: `chore: setup inicial do projeto Next.js com Tailwind, shadcn/ui e estrutura de pastas`
 
 ---
 
-## Milestone 1 — UI: Landing Page
+## Milestone 1 — UI: Shell do Dashboard
 
-**Branch**: `feature/ui-landing-page`
+**Branch**: `feature/ui-dashboard-shell`
 
-**Objetivo**: Construir a página pública de apresentação do produto, sem lógica de backend.
+**Objetivo**: Construir a casca do app autenticado — sidebar, navegação, dropdown de troca de workspace — com dados mockados.
 
 **Entregas**:
-- [ ] Seção Hero (proposta de valor, CTA principal)
-- [ ] Seção Funcionalidades (Kanban, Leads, Dashboard, Multi-empresa)
-- [ ] Seção Planos e Preços (Free vs Pro)
-- [ ] Seção CTA final (cadastro/login)
-- [ ] Layout responsivo (mobile/desktop)
-- [ ] Identidade visual aplicada (paleta, tipografia definidas no PRD)
+- [x] Layout `(dashboard)/[workspace]` com sidebar e área de conteúdo
+- [x] Sidebar com navegação (Leads, Pipeline, Dashboard, Configurações)
+- [x] Dropdown de troca de workspace (mock de lista de workspaces)
+- [x] Menu de usuário (perfil, logout)
+- [x] Estado vazio/skeleton de carregamento
 
-**Commit final**: `feat: landing page pública com hero, funcionalidades, planos e CTA`
+**Commit final**: `feat: shell do dashboard com sidebar, navegação e troca de workspace`
 
 ---
 
@@ -61,20 +60,21 @@
 
 ---
 
-## Milestone 3 — UI: Shell do Dashboard
+## Milestone 3 — UI: Landing Page
 
-**Branch**: `feature/ui-dashboard-shell`
+**Branch**: `feature/ui-landing-page`
 
-**Objetivo**: Construir a casca do app autenticado — sidebar, navegação, dropdown de troca de workspace — com dados mockados.
+**Objetivo**: Construir a página pública de apresentação do produto, sem lógica de backend.
 
 **Entregas**:
-- [ ] Layout `(dashboard)/[workspace]` com sidebar e área de conteúdo
-- [ ] Sidebar com navegação (Leads, Pipeline, Dashboard, Configurações)
-- [ ] Dropdown de troca de workspace (mock de lista de workspaces)
-- [ ] Menu de usuário (perfil, logout)
-- [ ] Estado vazio/skeleton de carregamento
+- [ ] Seção Hero (proposta de valor, CTA principal)
+- [ ] Seção Funcionalidades (Kanban, Leads, Dashboard, Multi-empresa)
+- [ ] Seção Planos e Preços (Free vs Pro)
+- [ ] Seção CTA final (cadastro/login)
+- [ ] Layout responsivo (mobile/desktop)
+- [ ] Identidade visual aplicada (paleta, tipografia definidas no PRD)
 
-**Commit final**: `feat: shell do dashboard com sidebar, navegação e troca de workspace`
+**Commit final**: `feat: landing page pública com hero, funcionalidades, planos e CTA`
 
 ---
 
@@ -240,7 +240,7 @@
 - [ ] Convite de colaboradores por e-mail via Resend
 - [ ] Aceite de convite e vínculo ao workspace
 - [ ] Papéis Admin/Membro aplicados nas Server Actions e RLS
-- [ ] Troca de workspace funcional (Milestone 3) com dados reais
+- [ ] Troca de workspace funcional (Milestone 1) com dados reais
 - [ ] Gerenciamento de colaboradores (listar, remover, alterar papel)
 
 **Commit final**: `feat: multi-empresa com convites por e-mail, papéis de acesso e troca de workspace`
