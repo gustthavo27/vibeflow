@@ -49,12 +49,12 @@
 **Objetivo**: Construir as telas de login, cadastro e onboarding (sem integração real com Supabase Auth ainda — formulários funcionais com validação client-side e navegação mockada).
 
 **Entregas**:
-- [ ] Tela de Login
-- [ ] Tela de Cadastro
-- [ ] Tela de Onboarding (criar/entrar em workspace)
-- [ ] Validação de formulários (client-side)
-- [ ] Estados de loading/erro (mockados)
-- [ ] Layout `(auth)` route group
+- [x] Tela de Login
+- [x] Tela de Cadastro
+- [x] Tela de Onboarding (criar workspace)
+- [x] Validação de formulários (client-side)
+- [x] Estados de loading/erro (mockados)
+- [x] Layout `(auth)` route group
 
 **Commit final**: `feat: telas de login, cadastro e onboarding com validação client-side`
 
