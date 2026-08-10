@@ -1,23 +1,12 @@
-import { Users } from "lucide-react";
+import { LeadsView } from "@/components/leads/leads-view";
+import { mockLeads } from "@/lib/mock-data";
 
-import { EmptyState } from "@/components/dashboard/empty-state";
+export default async function LeadsPage({
+  params,
+}: {
+  params: Promise<{ workspace: string }>;
+}) {
+  const { workspace } = await params;
 
-export default function LeadsPage() {
-  return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-heading text-2xl font-semibold tracking-tight text-foreground">
-          Leads
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Gerencie contatos e oportunidades do workspace.
-        </p>
-      </div>
-      <EmptyState
-        icon={Users}
-        title="Nenhum lead cadastrado"
-        description="Cadastre seu primeiro lead para começar a organizar o funil de vendas."
-      />
-    </div>
-  );
+  return <LeadsView workspace={workspace} initialLeads={mockLeads} />;
 }
