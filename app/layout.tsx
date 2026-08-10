@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { Fraunces, Geist_Mono, Hanken_Grotesk } from "next/font/google";
+import { Geist_Mono, Hanken_Grotesk, Syne } from "next/font/google";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const syne = Syne({
+  variable: "--font-syne",
   subsets: ["latin"],
-  weight: ["500", "600"],
-  style: ["normal", "italic"],
+  weight: ["600", "700", "800"],
 });
 
 const hankenGrotesk = Hanken_Grotesk({
@@ -30,7 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="pt-BR"
-      className={`dark ${fraunces.variable} ${hankenGrotesk.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${syne.variable} ${hankenGrotesk.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
         {children}

@@ -5,19 +5,16 @@ import { cn } from "@/lib/utils";
 function VibeflowLogo({ href, className }: { href?: string; className?: string }) {
   const content = (
     <>
-      <span className="flex size-6 items-center justify-center rounded-md bg-primary text-xs font-bold text-primary-foreground">
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-extrabold text-primary-foreground">
         V
       </span>
-      <span className="font-heading text-lg font-semibold tracking-tight">
-        Vibe<span className="italic text-primary">Flow</span>
+      <span className="font-heading text-lg font-bold tracking-tight text-sidebar-foreground">
+        VibeFlow
       </span>
     </>
   );
 
-  const classes = cn(
-    "flex items-center gap-2 text-sidebar-foreground",
-    className,
-  );
+  const classes = cn("flex items-center gap-2.5 text-sidebar-foreground", className);
 
   if (href) {
     return (

@@ -28,16 +28,11 @@ function SidebarNav({
             href={href}
             onClick={onNavigate}
             className={cn(
-              "relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-sidebar-foreground/65 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              isActive && "bg-sidebar-accent text-sidebar-accent-foreground",
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+              isActive &&
+                "bg-sidebar-primary text-sidebar-primary-foreground shadow-[0_0_0_1px_color-mix(in_oklch,var(--sidebar-primary)_35%,transparent)] hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
             )}
           >
-            <span
-              className={cn(
-                "absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-sidebar-primary opacity-0 transition-opacity",
-                isActive && "opacity-100",
-              )}
-            />
             <Icon className="size-4 shrink-0" />
             {item.label}
           </Link>
