@@ -89,11 +89,11 @@
 **Objetivo**: Construir o board Kanban de vendas com drag-and-drop visual (@dnd-kit), sem persistência ainda.
 
 **Entregas**:
-- [ ] Colunas por etapa (Novo Lead, Contato Realizado, Proposta Enviada, Negociação, Fechado Ganho, Fechado Perdido)
-- [ ] Card de negócio (título, valor estimado, lead vinculado, responsável, prazo)
-- [ ] Drag-and-drop entre colunas com @dnd-kit (estado local em memória)
-- [ ] Modal/painel de criação e edição de negócio
-- [ ] Estados visuais por coluna (contagem, valor total)
+- [x] Colunas por etapa (NOVO LEAD, CONTATO REALIZADO, PROPOSTA ENVIADA, NEGOCIAÇÃO, FECHADO GANHO, FECHADO PERDIDO)
+- [x] Card de negócio (título, valor estimado, lead vinculado, responsável, prazo)
+- [x] Drag-and-drop entre colunas com @dnd-kit (estado local em memória)
+- [x] Modal/painel de criação e edição de negócio
+- [x] Estados visuais por coluna (contagem, valor total)
 
 **Commit final**: `feat: pipeline Kanban com drag-and-drop e cards de negócio (dados mockados)`
 

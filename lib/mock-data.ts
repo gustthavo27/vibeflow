@@ -320,3 +320,189 @@ export const mockActivities: Activity[] = [
     data: "2026-07-18T14:00:00",
   },
 ];
+
+export const dealStages = [
+  "Novo Lead",
+  "Contato Realizado",
+  "Proposta Enviada",
+  "Negociação",
+  "Fechado Ganho",
+  "Fechado Perdido",
+] as const;
+
+export type DealStage = (typeof dealStages)[number];
+
+export type Deal = {
+  id: string;
+  titulo: string;
+  valorEstimado: number;
+  leadId: string;
+  responsavel: string;
+  prazo: string;
+  etapa: DealStage;
+};
+
+export const mockDeals: Deal[] = [
+  {
+    id: "d1",
+    titulo: "Implantação CRM - Bella Moda Atacado",
+    valorEstimado: 18000,
+    leadId: "5",
+    responsavel: "Rafael Souza",
+    prazo: "2026-08-25",
+    etapa: "Novo Lead",
+  },
+  {
+    id: "d2",
+    titulo: "Diagnóstico Inicial - Via Consultoria",
+    valorEstimado: 12000,
+    leadId: "3",
+    responsavel: "Marina Alves",
+    prazo: "2026-08-30",
+    etapa: "Novo Lead",
+  },
+  {
+    id: "d3",
+    titulo: "Avaliação de Necessidades - Lumina Cosméticos",
+    valorEstimado: 21000,
+    leadId: "11",
+    responsavel: "Rafael Souza",
+    prazo: "2026-09-05",
+    etapa: "Novo Lead",
+  },
+  {
+    id: "d4",
+    titulo: "Expansão de Licenças - Porto Express Logística",
+    valorEstimado: 15000,
+    leadId: "8",
+    responsavel: "Rafael Souza",
+    prazo: "2026-08-05",
+    etapa: "Contato Realizado",
+  },
+  {
+    id: "d5",
+    titulo: "Pacote Consultoria - Rota Segura Seguros",
+    valorEstimado: 9000,
+    leadId: "12",
+    responsavel: "Marina Alves",
+    prazo: "2026-08-18",
+    etapa: "Contato Realizado",
+  },
+  {
+    id: "d6",
+    titulo: "Upgrade de Plano - Grupo Alvorada",
+    valorEstimado: 22000,
+    leadId: "2",
+    responsavel: "Rafael Souza",
+    prazo: "2026-08-02",
+    etapa: "Contato Realizado",
+  },
+  {
+    id: "d7",
+    titulo: "Proposta Enterprise - Norte Tech Soluções",
+    valorEstimado: 48000,
+    leadId: "1",
+    responsavel: "Bianca Duarte",
+    prazo: "2026-08-20",
+    etapa: "Proposta Enviada",
+  },
+  {
+    id: "d8",
+    titulo: "Proposta Comercial - AgroVale Digital",
+    valorEstimado: 38000,
+    leadId: "6",
+    responsavel: "Marina Alves",
+    prazo: "2026-07-28",
+    etapa: "Proposta Enviada",
+  },
+  {
+    id: "d9",
+    titulo: "Renovação Anual - EduTech Brasil",
+    valorEstimado: 27000,
+    leadId: "9",
+    responsavel: "Marina Alves",
+    prazo: "2026-08-22",
+    etapa: "Proposta Enviada",
+  },
+  {
+    id: "d10",
+    titulo: "Ajuste de Escopo - Metal Forte SP",
+    valorEstimado: 60000,
+    leadId: "10",
+    responsavel: "Bianca Duarte",
+    prazo: "2026-08-15",
+    etapa: "Negociação",
+  },
+  {
+    id: "d11",
+    titulo: "Negociação de Contrato - Saúde Plena Vida",
+    valorEstimado: 25000,
+    leadId: "7",
+    responsavel: "Bianca Duarte",
+    prazo: "2026-08-01",
+    etapa: "Negociação",
+  },
+  {
+    id: "d12",
+    titulo: "Condições Comerciais - Arq Viva Design",
+    valorEstimado: 16000,
+    leadId: "13",
+    responsavel: "Bianca Duarte",
+    prazo: "2026-08-14",
+    etapa: "Negociação",
+  },
+  {
+    id: "d13",
+    titulo: "Contrato Fechado - ConstruFrame Engenharia",
+    valorEstimado: 65000,
+    leadId: "4",
+    responsavel: "Bianca Duarte",
+    prazo: "2026-06-19",
+    etapa: "Fechado Ganho",
+  },
+  {
+    id: "d14",
+    titulo: "Assinatura Confirmada - Metal Forte SP",
+    valorEstimado: 52000,
+    leadId: "10",
+    responsavel: "Bianca Duarte",
+    prazo: "2026-06-05",
+    etapa: "Fechado Ganho",
+  },
+  {
+    id: "d15",
+    titulo: "Fechamento Piloto - Norte Tech Soluções",
+    valorEstimado: 15000,
+    leadId: "1",
+    responsavel: "Bianca Duarte",
+    prazo: "2026-07-30",
+    etapa: "Fechado Ganho",
+  },
+  {
+    id: "d16",
+    titulo: "Oportunidade Perdida - Saúde Plena Vida",
+    valorEstimado: 18000,
+    leadId: "7",
+    responsavel: "Bianca Duarte",
+    prazo: "2026-06-15",
+    etapa: "Fechado Perdido",
+  },
+  {
+    id: "d17",
+    titulo: "Perdido para Concorrência - Arq Viva Design",
+    valorEstimado: 14000,
+    leadId: "13",
+    responsavel: "Bianca Duarte",
+    prazo: "2026-06-25",
+    etapa: "Fechado Perdido",
+  },
+  {
+    id: "d18",
+    titulo: "Sem Orçamento - Rota Segura Seguros",
+    valorEstimado: 9000,
+    leadId: "12",
+    responsavel: "Marina Alves",
+    prazo: "2026-06-30",
+    etapa: "Fechado Perdido",
+  },
+];
