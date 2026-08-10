@@ -60,7 +60,62 @@
 
 ---
 
-## Milestone 3 — UI: Landing Page
+## Milestone 3 — UI: Gestão de Leads e Atividades
+
+**Branch**: `feature/ui-leads-activities`
+
+**Objetivo**: Construir listagem, busca/filtros e página de detalhe de leads, incluindo a timeline de atividades vinculada ao lead — tudo com dados mockados.
+
+**Entregas**:
+- [ ] Listagem de leads (tabela/cards) com dados mock
+- [ ] Busca por nome/e-mail/empresa
+- [ ] Filtros por status, responsável e data
+- [ ] Formulário de cadastro/edição de lead (nome, e-mail, telefone, empresa, cargo, status)
+- [ ] Página de detalhe do lead (perfil completo)
+- [ ] Componente de upload de arquivos (UI, sem persistência)
+- [ ] Timeline cronológica de atividades no detalhe do lead
+- [ ] Formulário de nova atividade (tipo: Ligação, E-mail, Reunião, Nota)
+- [ ] Exibição de autor, descrição e data por item da timeline
+- [ ] Filtro por tipo de atividade
+
+**Commit final**: `feat: listagem, filtros, detalhe de leads e timeline de atividades com dados mockados`
+
+---
+
+## Milestone 4 — UI: Pipeline Kanban
+
+**Branch**: `feature/ui-pipeline-kanban`
+
+**Objetivo**: Construir o board Kanban de vendas com drag-and-drop visual (@dnd-kit), sem persistência ainda.
+
+**Entregas**:
+- [ ] Colunas por etapa (Novo Lead, Contato Realizado, Proposta Enviada, Negociação, Fechado Ganho, Fechado Perdido)
+- [ ] Card de negócio (título, valor estimado, lead vinculado, responsável, prazo)
+- [ ] Drag-and-drop entre colunas com @dnd-kit (estado local em memória)
+- [ ] Modal/painel de criação e edição de negócio
+- [ ] Estados visuais por coluna (contagem, valor total)
+
+**Commit final**: `feat: pipeline Kanban com drag-and-drop e cards de negócio (dados mockados)`
+
+---
+
+## Milestone 5 — UI: Dashboard de Métricas
+
+**Branch**: `feature/ui-dashboard-metrics`
+
+**Objetivo**: Construir os cards de métricas e o gráfico de funil com dados mockados.
+
+**Entregas**:
+- [ ] Cards: total de leads, negócios abertos, valor total do pipeline, taxa de conversão
+- [ ] Gráfico de funil de vendas (Recharts)
+- [ ] Lista de negócios do usuário logado com prazo próximo
+- [ ] Layout responsivo do dashboard
+
+**Commit final**: `feat: dashboard de métricas com cards e gráfico de funil (dados mockados)`
+
+---
+
+## Milestone 6 — UI: Landing Page
 
 **Branch**: `feature/ui-landing-page`
 
@@ -78,74 +133,7 @@
 
 ---
 
-## Milestone 4 — UI: Gestão de Leads e Contatos
-
-**Branch**: `feature/ui-leads`
-
-**Objetivo**: Construir listagem, busca/filtros e página de detalhe de leads com dados mockados.
-
-**Entregas**:
-- [ ] Listagem de leads (tabela/cards) com dados mock
-- [ ] Busca por nome/e-mail/empresa
-- [ ] Filtros por status, responsável e data
-- [ ] Formulário de cadastro/edição de lead (nome, e-mail, telefone, empresa, cargo, status)
-- [ ] Página de detalhe do lead (perfil completo)
-- [ ] Componente de upload de arquivos (UI, sem persistência)
-
-**Commit final**: `feat: listagem, filtros, cadastro e detalhe de leads com dados mockados`
-
----
-
-## Milestone 5 — UI: Pipeline Kanban
-
-**Branch**: `feature/ui-pipeline-kanban`
-
-**Objetivo**: Construir o board Kanban de vendas com drag-and-drop visual (@dnd-kit), sem persistência ainda.
-
-**Entregas**:
-- [ ] Colunas por etapa (Novo Lead, Contato Realizado, Proposta Enviada, Negociação, Fechado Ganho, Fechado Perdido)
-- [ ] Card de negócio (título, valor estimado, lead vinculado, responsável, prazo)
-- [ ] Drag-and-drop entre colunas com @dnd-kit (estado local em memória)
-- [ ] Modal/painel de criação e edição de negócio
-- [ ] Estados visuais por coluna (contagem, valor total)
-
-**Commit final**: `feat: pipeline Kanban com drag-and-drop e cards de negócio (dados mockados)`
-
----
-
-## Milestone 6 — UI: Registro de Atividades
-
-**Branch**: `feature/ui-activities`
-
-**Objetivo**: Construir a timeline de atividades vinculada ao lead, com dados mockados.
-
-**Entregas**:
-- [ ] Timeline cronológica no detalhe do lead
-- [ ] Formulário de nova atividade (tipo: Ligação, E-mail, Reunião, Nota)
-- [ ] Exibição de autor, descrição e data por item
-- [ ] Filtro por tipo de atividade
-
-**Commit final**: `feat: timeline de atividades no detalhe do lead com dados mockados`
-
----
-
-## Milestone 7 — UI: Dashboard de Métricas
-
-**Branch**: `feature/ui-dashboard-metrics`
-
-**Objetivo**: Construir os cards de métricas e o gráfico de funil com dados mockados.
-
-**Entregas**:
-- [ ] Cards: total de leads, negócios abertos, valor total do pipeline, taxa de conversão
-- [ ] Gráfico de funil de vendas (Recharts)
-- [ ] Lista de negócios do usuário logado com prazo próximo
-- [ ] Layout responsivo do dashboard
-
-**Commit final**: `feat: dashboard de métricas com cards e gráfico de funil (dados mockados)`
-
----
-
-## Milestone 8 — Backend: Supabase Setup e Schema
+## Milestone 7 — Backend: Supabase Setup e Schema
 
 **Branch**: `feature/backend-supabase-setup`
 
@@ -163,7 +151,7 @@
 
 ---
 
-## Milestone 9 — Backend: Autenticação Real
+## Milestone 8 — Backend: Autenticação Real
 
 **Branch**: `feature/backend-auth`
 
@@ -180,11 +168,11 @@
 
 ---
 
-## Milestone 10 — Backend: Leads e Contatos
+## Milestone 9 — Backend: Leads e Contatos
 
 **Branch**: `feature/backend-leads`
 
-**Objetivo**: Conectar a UI de leads (Milestone 4) a Server Actions com persistência real no Supabase.
+**Objetivo**: Conectar a UI de leads (Milestone 3) a Server Actions com persistência real no Supabase.
 
 **Entregas**:
 - [ ] Server Actions: criar, listar, atualizar, excluir lead
@@ -197,11 +185,11 @@
 
 ---
 
-## Milestone 11 — Backend: Pipeline Kanban
+## Milestone 10 — Backend: Pipeline Kanban
 
 **Branch**: `feature/backend-pipeline`
 
-**Objetivo**: Conectar o board Kanban (Milestone 5) à persistência real, incluindo a atualização de etapa via drag-and-drop.
+**Objetivo**: Conectar o board Kanban (Milestone 4) à persistência real, incluindo a atualização de etapa via drag-and-drop.
 
 **Entregas**:
 - [ ] Server Actions: criar, listar, atualizar (etapa/campos), excluir negócio
@@ -213,11 +201,11 @@
 
 ---
 
-## Milestone 12 — Backend: Atividades e Dashboard de Métricas
+## Milestone 11 — Backend: Atividades e Dashboard de Métricas
 
 **Branch**: `feature/backend-activities-metrics`
 
-**Objetivo**: Conectar a timeline de atividades (Milestone 6) e o dashboard de métricas (Milestone 7) a dados reais.
+**Objetivo**: Conectar a timeline de atividades (Milestone 3) e o dashboard de métricas (Milestone 5) a dados reais.
 
 **Entregas**:
 - [ ] Server Actions: criar e listar atividades por lead
@@ -229,7 +217,7 @@
 
 ---
 
-## Milestone 13 — Multi-empresa e Colaboração
+## Milestone 12 — Multi-empresa e Colaboração
 
 **Branch**: `feature/workspaces-collaboration`
 
@@ -247,7 +235,7 @@
 
 ---
 
-## Milestone 14 — Monetização (Stripe)
+## Milestone 13 — Monetização (Stripe)
 
 **Branch**: `feature/stripe-billing`
 
@@ -265,7 +253,7 @@
 
 ---
 
-## Milestone 15 — QA, Polimento e Deploy
+## Milestone 14 — QA, Polimento e Deploy
 
 **Branch**: `chore/release-v1`
 
