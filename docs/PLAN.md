@@ -67,15 +67,15 @@
 **Objetivo**: Construir listagem, busca/filtros e página de detalhe de leads, incluindo a timeline de atividades vinculada ao lead — tudo com dados mockados.
 
 **Entregas**:
-- [ ] Listagem de leads (tabela/cards) com dados mock
-- [ ] Busca por nome/e-mail/empresa
-- [ ] Filtros por status, responsável e data
-- [ ] Formulário de cadastro/edição de lead (nome, e-mail, telefone, empresa, cargo, status)
-- [ ] Página de detalhe do lead (perfil completo)
+- [x] Listagem de leads (tabela) com dados mock
+- [x] Busca por nome/e-mail/empresa
+- [x] Filtros por status (responsável e data ainda não implementados)
+- [x] Formulário de cadastro/edição/exclusão de lead (nome, e-mail, telefone, empresa, cargo, status, responsável, valor negociado, notas)
+- [x] Página de detalhe do lead (perfil completo, com edição direta)
 - [ ] Componente de upload de arquivos (UI, sem persistência)
-- [ ] Timeline cronológica de atividades no detalhe do lead
+- [x] Timeline cronológica de atividades no detalhe do lead (visual, somente leitura)
 - [ ] Formulário de nova atividade (tipo: Ligação, E-mail, Reunião, Nota)
-- [ ] Exibição de autor, descrição e data por item da timeline
+- [x] Exibição de autor, descrição e data por item da timeline
 - [ ] Filtro por tipo de atividade
 
 **Commit final**: `feat: listagem, filtros, detalhe de leads e timeline de atividades com dados mockados`
