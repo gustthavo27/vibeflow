@@ -122,12 +122,12 @@
 **Objetivo**: Construir a página pública de apresentação do produto, sem lógica de backend.
 
 **Entregas**:
-- [ ] Seção Hero (proposta de valor, CTA principal)
-- [ ] Seção Funcionalidades (Kanban, Leads, Dashboard, Multi-empresa)
-- [ ] Seção Planos e Preços (Free vs Pro)
-- [ ] Seção CTA final (cadastro/login)
-- [ ] Layout responsivo (mobile/desktop)
-- [ ] Identidade visual aplicada (paleta, tipografia definidas no PRD)
+- [x] Seção Hero (proposta de valor, CTA principal)
+- [x] Seção Funcionalidades (Kanban, Leads, Dashboard, Multi-empresa)
+- [x] Seção Planos e Preços (Free vs Pro)
+- [x] Seção CTA final (cadastro/login)
+- [x] Layout responsivo (mobile/desktop)
+- [x] Identidade visual aplicada (paleta, tipografia definidas no PRD)
 
 **Commit final**: `feat: landing page pública com hero, funcionalidades, planos e CTA`
 
