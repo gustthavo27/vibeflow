@@ -23,6 +23,12 @@ export type LeadStatus = (typeof leadStatuses)[number];
 
 export const mockTeamMembers = ["Bianca Duarte", "Rafael Souza", "Marina Alves"];
 
+export type Anexo = {
+  id: string;
+  nome: string;
+  tamanhoBytes: number;
+};
+
 export type Lead = {
   id: string;
   nome: string;
@@ -35,6 +41,7 @@ export type Lead = {
   criadoEm: string;
   valorNegociado: number;
   notas: string;
+  anexos: Anexo[];
 };
 
 export const mockLeads: Lead[] = [
@@ -50,6 +57,7 @@ export const mockLeads: Lead[] = [
     criadoEm: "2026-07-02",
     valorNegociado: 48000,
     notas: "Interessada no pacote enterprise. Reunião marcada para próxima semana.",
+    anexos: [],
   },
   {
     id: "2",
@@ -63,6 +71,7 @@ export const mockLeads: Lead[] = [
     criadoEm: "2026-07-05",
     valorNegociado: 22000,
     notas: "Aguardando retorno sobre a proposta comercial enviada.",
+    anexos: [],
   },
   {
     id: "3",
@@ -76,6 +85,7 @@ export const mockLeads: Lead[] = [
     criadoEm: "2026-07-18",
     valorNegociado: 0,
     notas: "",
+    anexos: [],
   },
   {
     id: "4",
@@ -89,6 +99,7 @@ export const mockLeads: Lead[] = [
     criadoEm: "2026-06-20",
     valorNegociado: 65000,
     notas: "Contrato assinado. Onboarding agendado com o time técnico.",
+    anexos: [],
   },
   {
     id: "5",
@@ -102,6 +113,7 @@ export const mockLeads: Lead[] = [
     criadoEm: "2026-07-20",
     valorNegociado: 0,
     notas: "Veio de indicação de outro cliente.",
+    anexos: [],
   },
   {
     id: "6",
@@ -115,6 +127,7 @@ export const mockLeads: Lead[] = [
     criadoEm: "2026-06-28",
     valorNegociado: 38000,
     notas: "Precisa de integração com sistema legado antes de fechar.",
+    anexos: [],
   },
   {
     id: "7",
@@ -128,6 +141,7 @@ export const mockLeads: Lead[] = [
     criadoEm: "2026-06-15",
     valorNegociado: 0,
     notas: "Optou por concorrente com preço mais baixo.",
+    anexos: [],
   },
   {
     id: "8",
@@ -141,6 +155,7 @@ export const mockLeads: Lead[] = [
     criadoEm: "2026-07-10",
     valorNegociado: 15000,
     notas: "",
+    anexos: [],
   },
   {
     id: "9",
@@ -154,6 +169,7 @@ export const mockLeads: Lead[] = [
     criadoEm: "2026-07-14",
     valorNegociado: 27000,
     notas: "Lead de alta prioridade, veio de indicação da EduPrime.",
+    anexos: [],
   },
   {
     id: "10",
@@ -167,6 +183,7 @@ export const mockLeads: Lead[] = [
     criadoEm: "2026-06-08",
     valorNegociado: 52000,
     notas: "Cliente convertido, satisfeito com o tempo de implantação.",
+    anexos: [],
   },
   {
     id: "11",
@@ -180,6 +197,7 @@ export const mockLeads: Lead[] = [
     criadoEm: "2026-07-22",
     valorNegociado: 0,
     notas: "",
+    anexos: [],
   },
   {
     id: "12",
@@ -193,6 +211,7 @@ export const mockLeads: Lead[] = [
     criadoEm: "2026-07-08",
     valorNegociado: 9000,
     notas: "Pediu para retornar contato depois do fechamento do trimestre.",
+    anexos: [],
   },
   {
     id: "13",
@@ -206,6 +225,7 @@ export const mockLeads: Lead[] = [
     criadoEm: "2026-06-25",
     valorNegociado: 0,
     notas: "Sem orçamento disponível neste ano.",
+    anexos: [],
   },
 ];
 
@@ -340,6 +360,8 @@ export type Deal = {
   responsavel: string;
   prazo: string;
   etapa: DealStage;
+  notas: string;
+  anexos: Anexo[];
 };
 
 export const mockDeals: Deal[] = [
@@ -351,6 +373,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Rafael Souza",
     prazo: "2026-08-25",
     etapa: "Novo Lead",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d2",
@@ -360,6 +384,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Marina Alves",
     prazo: "2026-08-30",
     etapa: "Novo Lead",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d3",
@@ -369,6 +395,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Rafael Souza",
     prazo: "2026-09-05",
     etapa: "Novo Lead",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d4",
@@ -378,6 +406,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Rafael Souza",
     prazo: "2026-08-05",
     etapa: "Contato Realizado",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d5",
@@ -387,6 +417,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Marina Alves",
     prazo: "2026-08-18",
     etapa: "Contato Realizado",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d6",
@@ -396,6 +428,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Rafael Souza",
     prazo: "2026-08-02",
     etapa: "Contato Realizado",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d7",
@@ -405,6 +439,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Bianca Duarte",
     prazo: "2026-08-20",
     etapa: "Proposta Enviada",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d8",
@@ -414,6 +450,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Marina Alves",
     prazo: "2026-07-28",
     etapa: "Proposta Enviada",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d9",
@@ -423,6 +461,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Marina Alves",
     prazo: "2026-08-22",
     etapa: "Proposta Enviada",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d10",
@@ -432,6 +472,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Bianca Duarte",
     prazo: "2026-08-15",
     etapa: "Negociação",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d11",
@@ -441,6 +483,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Bianca Duarte",
     prazo: "2026-08-01",
     etapa: "Negociação",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d12",
@@ -450,6 +494,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Bianca Duarte",
     prazo: "2026-08-14",
     etapa: "Negociação",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d13",
@@ -459,6 +505,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Bianca Duarte",
     prazo: "2026-06-19",
     etapa: "Fechado Ganho",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d14",
@@ -468,6 +516,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Bianca Duarte",
     prazo: "2026-06-05",
     etapa: "Fechado Ganho",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d15",
@@ -477,6 +527,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Bianca Duarte",
     prazo: "2026-07-30",
     etapa: "Fechado Ganho",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d16",
@@ -486,6 +538,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Bianca Duarte",
     prazo: "2026-06-15",
     etapa: "Fechado Perdido",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d17",
@@ -495,6 +549,8 @@ export const mockDeals: Deal[] = [
     responsavel: "Bianca Duarte",
     prazo: "2026-06-25",
     etapa: "Fechado Perdido",
+    anexos: [],
+    notas: "",
   },
   {
     id: "d18",
@@ -504,5 +560,7 @@ export const mockDeals: Deal[] = [
     responsavel: "Marina Alves",
     prazo: "2026-06-30",
     etapa: "Fechado Perdido",
+    anexos: [],
+    notas: "",
   },
 ];

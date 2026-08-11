@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Briefcase, Building2, CalendarDays, Mail, Pencil, Phone, Wallet } from "lucide-react";
+import { Briefcase, Building2, CalendarDays, Mail, Paperclip, Pencil, Phone, Wallet } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ActivityTimeline } from "@/components/leads/activity-timeline";
 import { LeadFormDialog, type LeadFormValues } from "@/components/leads/lead-form-dialog";
 import { LeadStatusBadge } from "@/components/leads/lead-status-badge";
+import { formatFileSize } from "@/components/shared/file-attachments-field";
 import type { Activity, Lead } from "@/lib/mock-data";
 import { cn, formatCurrency } from "@/lib/utils";
 
@@ -100,6 +101,26 @@ function LeadDetailView({
           <div className={cn("flex flex-col gap-1 border-t border-border pt-3 text-sm", !lead.notas && "hidden")}>
             <span className="text-muted-foreground">Notas</span>
             <p className="text-foreground">{lead.notas}</p>
+          </div>
+
+          <div
+            className={cn(
+              "flex flex-col gap-1.5 border-t border-border pt-3 text-sm",
+              lead.anexos.length === 0 && "hidden",
+            )}
+          >
+            <span className="text-muted-foreground">Anexos</span>
+            <ul className="flex flex-col gap-1.5">
+              {lead.anexos.map((anexo) => (
+                <li key={anexo.id} className="flex items-center gap-2 text-foreground">
+                  <Paperclip className="size-3.5 shrink-0 text-muted-foreground" />
+                  <span className="min-w-0 truncate">{anexo.nome}</span>
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    {formatFileSize(anexo.tamanhoBytes)}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         </CardContent>
       </Card>

@@ -1,9 +1,17 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
+import { useId, useState, type ChangeEvent, type FormEvent } from "react";
 import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/ui/combobox";
 import {
   Dialog,
   DialogContent,
@@ -21,7 +29,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { dealStages, mockLeads, mockTeamMembers, type Deal, type DealStage } from "@/lib/mock-data";
+import { Textarea } from "@/components/ui/textarea";
+import { FileAttachmentsField } from "@/components/shared/file-attachments-field";
+import {
+  dealStages,
+  mockLeads,
+  mockTeamMembers,
+  type Anexo,
+  type Deal,
+  type DealStage,
+  type Lead,
+} from "@/lib/mock-data";
+
+function leadLabel(lead: Lead) {
+  return `${lead.nome} — ${lead.empresa}`;
+}
 
 export type DealFormValues = {
   titulo: string;
@@ -30,9 +52,35 @@ export type DealFormValues = {
   responsavel: string;
   prazo: string;
   etapa: DealStage;
+  notas: string;
+  anexos: Anexo[];
 };
 
 type FormErrors = Partial<Record<"titulo" | "leadId" | "prazo", string>>;
+
+function isoToDisplayDate(iso: string) {
+  const [year, month, day] = iso.split("-");
+  if (!year || !month || !day) return "";
+  return `${day}/${month}/${year}`;
+}
+
+function isValidCalendarDate(day: number, month: number, year: number) {
+  const date = new Date(year, month - 1, day);
+  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+}
+
+function displayDateToIso(display: string) {
+  const match = display.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) return "";
+  const [, day, month, year] = match;
+  if (!isValidCalendarDate(Number(day), Number(month), Number(year))) return "";
+  return `${year}-${month}-${day}`;
+}
+
+function maskDateInput(raw: string) {
+  const digits = raw.replace(/\D/g, "").slice(0, 8);
+  return [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4, 8)].filter(Boolean).join("/");
+}
 
 function buildEmptyValues(defaultStage: DealStage): DealFormValues {
   return {
@@ -42,6 +90,8 @@ function buildEmptyValues(defaultStage: DealStage): DealFormValues {
     responsavel: mockTeamMembers[0],
     prazo: "",
     etapa: defaultStage,
+    notas: "",
+    anexos: [],
   };
 }
 
@@ -64,8 +114,15 @@ function DealFormDialog({
   const [values, setValues] = useState<DealFormValues>(() =>
     deal ? { ...deal } : buildEmptyValues(defaultStage),
   );
+  const [prazoText, setPrazoText] = useState(() => isoToDisplayDate(deal?.prazo ?? ""));
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function handlePrazoChange(event: ChangeEvent<HTMLInputElement>) {
+    const masked = maskDateInput(event.target.value);
+    setPrazoText(masked);
+    setValues((v) => ({ ...v, prazo: displayDateToIso(masked) }));
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -114,30 +171,37 @@ function DealFormDialog({
 
             <Field data-invalid={!!errors.leadId}>
               <FieldLabel htmlFor="leadId">Lead vinculado *</FieldLabel>
-              <Select
-                value={values.leadId}
-                onValueChange={(leadId) =>
-                  setValues((v) => ({ ...v, leadId: leadId ?? v.leadId }))
+              <Combobox
+                items={mockLeads}
+                itemToStringLabel={leadLabel}
+                value={mockLeads.find((lead) => lead.id === values.leadId) ?? null}
+                onValueChange={(lead) =>
+                  setValues((v) => ({ ...v, leadId: lead?.id ?? "" }))
                 }
               >
-                <SelectTrigger id="leadId" className="w-full">
-                  <SelectValue>
-                    {(leadId: string) => {
-                      const selectedLead = mockLeads.find((lead) => lead.id === leadId);
-                      return selectedLead
-                        ? `${selectedLead.nome} — ${selectedLead.empresa}`
-                        : "Selecione um lead";
-                    }}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {mockLeads.map((lead) => (
-                    <SelectItem key={lead.id} value={lead.id}>
-                      {lead.nome} — {lead.empresa}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <ComboboxInput
+                  id="leadId"
+                  placeholder="Buscar por nome ou empresa..."
+                  aria-invalid={!!errors.leadId}
+                  showClear
+                  className="w-full"
+                />
+                <ComboboxContent>
+                  <ComboboxEmpty>Nenhum lead encontrado.</ComboboxEmpty>
+                  <ComboboxList>
+                    {(lead: Lead) => (
+                      <ComboboxItem key={lead.id} value={lead}>
+                        <div className="flex min-w-0 flex-col">
+                          <span className="truncate">{lead.nome}</span>
+                          <span className="truncate text-xs text-muted-foreground">
+                            {lead.empresa}
+                          </span>
+                        </div>
+                      </ComboboxItem>
+                    )}
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
               <FieldError>{errors.leadId}</FieldError>
             </Field>
 
@@ -181,10 +245,13 @@ function DealFormDialog({
               <FieldLabel htmlFor="prazo">Prazo *</FieldLabel>
               <Input
                 id="prazo"
-                type="date"
-                value={values.prazo}
+                type="text"
+                inputMode="numeric"
+                placeholder="dd/mm/aaaa"
+                maxLength={10}
+                value={prazoText}
                 aria-invalid={!!errors.prazo}
-                onChange={(event) => setValues((v) => ({ ...v, prazo: event.target.value }))}
+                onChange={handlePrazoChange}
               />
               <FieldError>{errors.prazo}</FieldError>
             </Field>
@@ -208,6 +275,25 @@ function DealFormDialog({
                   ))}
                 </SelectContent>
               </Select>
+            </Field>
+
+            <Field className="sm:col-span-2">
+              <FieldLabel htmlFor="notas">Notas</FieldLabel>
+              <Textarea
+                id="notas"
+                placeholder="Detalhes sobre a negociação..."
+                rows={3}
+                value={values.notas}
+                onChange={(event) => setValues((v) => ({ ...v, notas: event.target.value }))}
+              />
+            </Field>
+
+            <Field className="sm:col-span-2">
+              <FieldLabel>Anexos</FieldLabel>
+              <FileAttachmentsField
+                anexos={values.anexos}
+                onChange={(anexos) => setValues((v) => ({ ...v, anexos }))}
+              />
             </Field>
           </div>
         </form>

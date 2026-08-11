@@ -22,7 +22,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { leadStatuses, mockTeamMembers, type Lead, type LeadStatus } from "@/lib/mock-data";
+import { FileAttachmentsField } from "@/components/shared/file-attachments-field";
+import { leadStatuses, mockTeamMembers, type Anexo, type Lead, type LeadStatus } from "@/lib/mock-data";
 import {
   validateLeadCompany,
   validateLeadEmail,
@@ -40,6 +41,7 @@ export type LeadFormValues = {
   responsavel: string;
   valorNegociado: number;
   notas: string;
+  anexos: Anexo[];
 };
 
 type FormErrors = Partial<Record<"nome" | "email" | "telefone" | "empresa", string>>;
@@ -54,6 +56,7 @@ const emptyValues: LeadFormValues = {
   responsavel: mockTeamMembers[0],
   valorNegociado: 0,
   notas: "",
+  anexos: [],
 };
 
 function LeadFormDialog({
@@ -230,6 +233,14 @@ function LeadFormDialog({
                 rows={3}
                 value={values.notas}
                 onChange={(event) => setValues((v) => ({ ...v, notas: event.target.value }))}
+              />
+            </Field>
+
+            <Field className="sm:col-span-2">
+              <FieldLabel>Anexos</FieldLabel>
+              <FileAttachmentsField
+                anexos={values.anexos}
+                onChange={(anexos) => setValues((v) => ({ ...v, anexos }))}
               />
             </Field>
           </div>
