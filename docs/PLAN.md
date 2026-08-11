@@ -72,7 +72,7 @@
 - [x] Filtros por status (responsável e data ainda não implementados)
 - [x] Formulário de cadastro/edição/exclusão de lead (nome, e-mail, telefone, empresa, cargo, status, responsável, valor negociado, notas)
 - [x] Página de detalhe do lead (perfil completo, com edição direta)
-- [ ] Componente de upload de arquivos (UI, sem persistência)
+- [x] Componente de upload de arquivos (UI, sem persistência)
 - [x] Timeline cronológica de atividades no detalhe do lead (visual, somente leitura)
 - [ ] Formulário de nova atividade (tipo: Ligação, E-mail, Reunião, Nota)
 - [x] Exibição de autor, descrição e data por item da timeline
@@ -106,10 +106,10 @@
 **Objetivo**: Construir os cards de métricas e o gráfico de funil com dados mockados.
 
 **Entregas**:
-- [ ] Cards: total de leads, negócios abertos, valor total do pipeline, taxa de conversão
-- [ ] Gráfico de funil de vendas (Recharts)
-- [ ] Lista de negócios do usuário logado com prazo próximo
-- [ ] Layout responsivo do dashboard
+- [x] Cards: total de leads, negócios abertos, valor total do pipeline, taxa de conversão
+- [x] Gráfico de funil de vendas (Recharts)
+- [x] Lista de negócios com prazo próximo (todos os responsáveis; filtro por usuário logado fica para o backend real)
+- [x] Layout responsivo do dashboard
 
 **Commit final**: `feat: dashboard de métricas com cards e gráfico de funil (dados mockados)`
 

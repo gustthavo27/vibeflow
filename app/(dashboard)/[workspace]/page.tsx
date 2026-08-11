@@ -1,6 +1,6 @@
-import { LayoutDashboard } from "lucide-react";
-
-import { EmptyState } from "@/components/dashboard/empty-state";
+import { MetricsCards } from "@/components/dashboard/metrics-cards";
+import { SalesFunnelChart } from "@/components/dashboard/sales-funnel-chart";
+import { UpcomingDealsTable } from "@/components/dashboard/upcoming-deals-table";
 
 export default function DashboardPage() {
   return (
@@ -11,11 +11,17 @@ export default function DashboardPage() {
         </h1>
         <p className="text-sm text-muted-foreground">Visão geral de vendas do workspace.</p>
       </div>
-      <EmptyState
-        icon={LayoutDashboard}
-        title="Seu dashboard ainda está vazio"
-        description="Métricas de vendas, funil e prazos vão aparecer aqui assim que houver leads e negócios no workspace."
-      />
+
+      <MetricsCards />
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-5">
+        <div className="xl:col-span-2">
+          <SalesFunnelChart />
+        </div>
+        <div className="xl:col-span-3">
+          <UpcomingDealsTable />
+        </div>
+      </div>
     </div>
   );
 }
