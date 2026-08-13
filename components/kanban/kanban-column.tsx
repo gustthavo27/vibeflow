@@ -5,15 +5,21 @@ import { Plus } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { DEAL_STAGE_LABELS } from "@/lib/labels";
 import { cn, formatCurrency } from "@/lib/utils";
-import type { Deal, DealStage, Lead } from "@/lib/mock-data";
+import type { Database, DealStage } from "@/lib/supabase/types";
+import type { WorkspaceMember } from "@/lib/workspace";
 import { DealCard } from "./deal-card";
 import { stageDotClasses } from "./stage-styles";
+
+type Deal = Database["public"]["Tables"]["deals"]["Row"];
+type Lead = Database["public"]["Tables"]["leads"]["Row"];
 
 function KanbanColumn({
   stage,
   deals,
   leadsById,
+  membersById,
   today,
   onQuickAdd,
   onEditDeal,
@@ -21,13 +27,14 @@ function KanbanColumn({
   stage: DealStage;
   deals: Deal[];
   leadsById: Map<string, Lead>;
+  membersById: Map<string, WorkspaceMember>;
   today: string;
   onQuickAdd: (stage: DealStage) => void;
   onEditDeal: (deal: Deal) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: stage });
 
-  const total = deals.reduce((sum, deal) => sum + deal.valorEstimado, 0);
+  const total = deals.reduce((sum, deal) => sum + deal.estimated_value, 0);
 
   return (
     <div className="flex w-60 shrink-0 flex-col rounded-2xl bg-card/40 ring-1 ring-foreground/10">
@@ -36,7 +43,7 @@ function KanbanColumn({
           <div className="flex min-w-0 items-center gap-2">
             <span className={cn("size-2 shrink-0 rounded-full", stageDotClasses[stage])} />
             <span className="truncate font-mono text-xs font-medium tracking-wide text-muted-foreground uppercase">
-              {stage}
+              {DEAL_STAGE_LABELS[stage]}
             </span>
             <Badge variant="secondary" className="shrink-0">
               {deals.length}
@@ -45,7 +52,7 @@ function KanbanColumn({
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label={`Adicionar negócio em ${stage}`}
+            aria-label={`Adicionar negócio em ${DEAL_STAGE_LABELS[stage]}`}
             onClick={() => onQuickAdd(stage)}
           >
             <Plus />
@@ -65,7 +72,8 @@ function KanbanColumn({
           <DealCard
             key={deal.id}
             deal={deal}
-            lead={leadsById.get(deal.leadId)}
+            lead={deal.lead_id ? leadsById.get(deal.lead_id) : undefined}
+            owner={deal.owner_id ? membersById.get(deal.owner_id) : undefined}
             onClick={() => onEditDeal(deal)}
             today={today}
           />

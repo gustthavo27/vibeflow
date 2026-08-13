@@ -13,30 +13,51 @@ import {
 } from "@dnd-kit/core";
 
 import { Button } from "@/components/ui/button";
-import { dealStages, mockLeads, type Deal, type DealStage } from "@/lib/mock-data";
+import { createDeal, updateDeal, updateDealStage } from "@/lib/actions/deals";
+import { DEAL_STAGE_OPTIONS } from "@/lib/labels";
+import type { Database, DealStage } from "@/lib/supabase/types";
+import type { WorkspaceMember } from "@/lib/workspace";
 import { DealCardPreview } from "./deal-card";
 import { DealFormDialog, type DealFormValues } from "./deal-form-dialog";
 import { KanbanColumn } from "./kanban-column";
 
-function KanbanBoard({ initialDeals }: { initialDeals: Deal[] }) {
+type Deal = Database["public"]["Tables"]["deals"]["Row"];
+type Lead = Database["public"]["Tables"]["leads"]["Row"];
+
+function KanbanBoard({
+  workspace,
+  initialDeals,
+  leads,
+  members,
+}: {
+  workspace: string;
+  initialDeals: Deal[];
+  leads: Lead[];
+  members: WorkspaceMember[];
+}) {
   const [deals, setDeals] = useState<Deal[]>(initialDeals);
   const [activeDeal, setActiveDeal] = useState<Deal | null>(null);
+  const [dragError, setDragError] = useState<string | undefined>();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingDeal, setEditingDeal] = useState<Deal | undefined>(undefined);
-  const [defaultStage, setDefaultStage] = useState<DealStage>(dealStages[0]);
+  const [defaultStage, setDefaultStage] = useState<DealStage>(DEAL_STAGE_OPTIONS[0]);
   const [formKey, setFormKey] = useState(0);
 
   const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
-  const leadsById = useMemo(() => new Map(mockLeads.map((lead) => [lead.id, lead])), []);
+  const leadsById = useMemo(() => new Map(leads.map((lead) => [lead.id, lead])), [leads]);
+  const membersById = useMemo(
+    () => new Map(members.map((member) => [member.user_id, member])),
+    [members],
+  );
 
   const dealsByStage = useMemo(() => {
     const map = new Map<DealStage, Deal[]>();
-    for (const stage of dealStages) {
+    for (const stage of DEAL_STAGE_OPTIONS) {
       map.set(
         stage,
-        deals.filter((deal) => deal.etapa === stage),
+        deals.filter((deal) => deal.stage === stage),
       );
     }
     return map;
@@ -51,23 +72,36 @@ function KanbanBoard({ initialDeals }: { initialDeals: Deal[] }) {
     setActiveDeal(deal ?? null);
   }
 
-  function handleDragEnd(event: DragEndEvent) {
+  async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     setActiveDeal(null);
 
     if (!over) return;
 
     const targetStage = over.id as DealStage;
-    if (!dealStages.includes(targetStage)) return;
+    if (!DEAL_STAGE_OPTIONS.includes(targetStage)) return;
 
+    const dealId = active.id as string;
+    const previousDeal = deals.find((deal) => deal.id === dealId);
+    if (!previousDeal || previousDeal.stage === targetStage) return;
+
+    setDragError(undefined);
     setDeals((prev) =>
-      prev.map((deal) => (deal.id === active.id ? { ...deal, etapa: targetStage } : deal)),
+      prev.map((deal) => (deal.id === dealId ? { ...deal, stage: targetStage } : deal)),
     );
+
+    const result = await updateDealStage(workspace, dealId, targetStage);
+    if (!result.success) {
+      setDeals((prev) =>
+        prev.map((deal) => (deal.id === dealId ? { ...deal, stage: previousDeal.stage } : deal)),
+      );
+      setDragError(result.error);
+    }
   }
 
   function openCreateForm() {
     setEditingDeal(undefined);
-    setDefaultStage(dealStages[0]);
+    setDefaultStage(DEAL_STAGE_OPTIONS[0]);
     setFormKey((k) => k + 1);
     setFormOpen(true);
   }
@@ -81,24 +115,28 @@ function KanbanBoard({ initialDeals }: { initialDeals: Deal[] }) {
 
   function openEditForm(deal: Deal) {
     setEditingDeal(deal);
-    setDefaultStage(deal.etapa);
+    setDefaultStage(deal.stage);
     setFormKey((k) => k + 1);
     setFormOpen(true);
   }
 
-  function handleSubmit(values: DealFormValues) {
-    if (editingDeal) {
-      setDeals((prev) =>
-        prev.map((deal) => (deal.id === editingDeal.id ? { ...deal, ...values } : deal)),
-      );
-    } else {
-      const newDeal: Deal = {
-        ...values,
-        id: crypto.randomUUID(),
-      };
-      setDeals((prev) => [newDeal, ...prev]);
+  async function handleSubmit(values: DealFormValues) {
+    const result = editingDeal
+      ? await updateDeal(workspace, editingDeal.id, values)
+      : await createDeal(workspace, values);
+
+    if (!result.success) {
+      return { success: false, error: result.error, fieldErrors: result.fieldErrors };
     }
-    setFormOpen(false);
+
+    setDeals((prev) => {
+      if (editingDeal) {
+        return prev.map((deal) => (deal.id === result.data.id ? result.data : deal));
+      }
+      return [result.data, ...prev];
+    });
+
+    return { success: true };
   }
 
   return (
@@ -118,6 +156,8 @@ function KanbanBoard({ initialDeals }: { initialDeals: Deal[] }) {
         </Button>
       </div>
 
+      {dragError && <p className="text-sm text-destructive">{dragError}</p>}
+
       <DndContext
         id="pipeline-kanban"
         sensors={sensors}
@@ -126,12 +166,13 @@ function KanbanBoard({ initialDeals }: { initialDeals: Deal[] }) {
       >
         <div className="persistent-scrollbar min-h-0 flex-1 overflow-auto">
           <div className="flex w-max gap-3 pb-3">
-            {dealStages.map((stage) => (
+            {DEAL_STAGE_OPTIONS.map((stage) => (
               <KanbanColumn
                 key={stage}
                 stage={stage}
                 deals={dealsByStage.get(stage) ?? []}
                 leadsById={leadsById}
+                membersById={membersById}
                 today={today}
                 onQuickAdd={openQuickAdd}
                 onEditDeal={openEditForm}
@@ -145,7 +186,8 @@ function KanbanBoard({ initialDeals }: { initialDeals: Deal[] }) {
             <div className="w-72">
               <DealCardPreview
                 deal={activeDeal}
-                lead={leadsById.get(activeDeal.leadId)}
+                lead={activeDeal.lead_id ? leadsById.get(activeDeal.lead_id) : undefined}
+                owner={activeDeal.owner_id ? membersById.get(activeDeal.owner_id) : undefined}
                 today={today}
               />
             </div>
@@ -159,6 +201,8 @@ function KanbanBoard({ initialDeals }: { initialDeals: Deal[] }) {
         onOpenChange={setFormOpen}
         deal={editingDeal}
         defaultStage={defaultStage}
+        leads={leads}
+        members={members}
         onSubmit={handleSubmit}
       />
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Plus, Search, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -16,32 +16,54 @@ import {
 import { DeleteLeadDialog } from "@/components/leads/delete-lead-dialog";
 import { LeadFormDialog, type LeadFormValues } from "@/components/leads/lead-form-dialog";
 import { LeadsTable } from "@/components/leads/leads-table";
-import { leadStatuses, type Lead } from "@/lib/mock-data";
+import { createLead, deleteLead, listLeads, updateLead } from "@/lib/actions/leads";
+import { LEAD_STATUS_LABELS, LEAD_STATUS_OPTIONS } from "@/lib/labels";
+import type { Database, LeadStatus } from "@/lib/supabase/types";
+import type { WorkspaceMember } from "@/lib/workspace";
 
-const STATUS_ALL = "Todos";
+type Lead = Database["public"]["Tables"]["leads"]["Row"];
 
-function LeadsView({ workspace, initialLeads }: { workspace: string; initialLeads: Lead[] }) {
+const STATUS_ALL = "all";
+
+function LeadsView({
+  workspace,
+  initialLeads,
+  members,
+}: {
+  workspace: string;
+  initialLeads: Lead[];
+  members: WorkspaceMember[];
+}) {
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>(STATUS_ALL);
+  const [statusFilter, setStatusFilter] = useState<LeadStatus | "all">(STATUS_ALL);
+  const [loadError, setLoadError] = useState<string | undefined>();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingLead, setEditingLead] = useState<Lead | undefined>(undefined);
   const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [formKey, setFormKey] = useState(0);
 
-  const filteredLeads = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    return leads.filter((lead) => {
-      const matchesQuery =
-        !query ||
-        lead.nome.toLowerCase().includes(query) ||
-        lead.empresa.toLowerCase().includes(query) ||
-        lead.email.toLowerCase().includes(query);
-      const matchesStatus = statusFilter === STATUS_ALL || lead.status === statusFilter;
-      return matchesQuery && matchesStatus;
-    });
-  }, [leads, search, statusFilter]);
+  const membersById = useMemo(
+    () => new Map(members.map((member) => [member.user_id, member])),
+    [members],
+  );
+
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      listLeads(workspace, { search, status: statusFilter }).then((result) => {
+        if (result.success) {
+          setLeads(result.data);
+          setLoadError(undefined);
+        } else {
+          setLoadError(result.error);
+        }
+      });
+    }, 300);
+
+    return () => clearTimeout(handle);
+  }, [workspace, search, statusFilter]);
 
   function openCreateForm() {
     setEditingLead(undefined);
@@ -55,25 +77,37 @@ function LeadsView({ workspace, initialLeads }: { workspace: string; initialLead
     setFormOpen(true);
   }
 
-  function handleSubmit(values: LeadFormValues) {
-    if (editingLead) {
-      setLeads((prev) =>
-        prev.map((lead) => (lead.id === editingLead.id ? { ...lead, ...values } : lead)),
-      );
-    } else {
-      const newLead: Lead = {
-        ...values,
-        id: crypto.randomUUID(),
-        criadoEm: new Date().toISOString().slice(0, 10),
-      };
-      setLeads((prev) => [newLead, ...prev]);
+  async function handleSubmit(values: LeadFormValues) {
+    const result = editingLead
+      ? await updateLead(workspace, editingLead.id, values)
+      : await createLead(workspace, values);
+
+    if (!result.success) {
+      return { success: false, error: result.error, fieldErrors: result.fieldErrors };
     }
-    setFormOpen(false);
+
+    setLeads((prev) => {
+      if (editingLead) {
+        return prev.map((lead) => (lead.id === result.data.id ? result.data : lead));
+      }
+      return [result.data, ...prev];
+    });
+
+    return { success: true };
   }
 
-  function handleDelete(lead: Lead) {
-    setLeads((prev) => prev.filter((item) => item.id !== lead.id));
-    setLeadToDelete(null);
+  async function handleDelete(lead: Lead) {
+    setIsDeleting(true);
+    const result = await deleteLead(workspace, lead.id);
+    setIsDeleting(false);
+
+    if (result.success) {
+      setLeads((prev) => prev.filter((item) => item.id !== lead.id));
+      setLeadToDelete(null);
+      setLoadError(undefined);
+    } else {
+      setLoadError(result.error);
+    }
   }
 
   return (
@@ -105,26 +139,29 @@ function LeadsView({ workspace, initialLeads }: { workspace: string; initialLead
         </div>
         <Select
           value={statusFilter}
-          onValueChange={(value) => setStatusFilter(value ?? STATUS_ALL)}
+          onValueChange={(value) => setStatusFilter((value as LeadStatus | "all") ?? STATUS_ALL)}
         >
           <SelectTrigger className="w-full sm:w-48">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value={STATUS_ALL}>Todos os status</SelectItem>
-            {leadStatuses.map((status) => (
+            {LEAD_STATUS_OPTIONS.map((status) => (
               <SelectItem key={status} value={status}>
-                {status}
+                {LEAD_STATUS_LABELS[status]}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
 
-      {filteredLeads.length > 0 ? (
+      {loadError && <p className="text-sm text-destructive">{loadError}</p>}
+
+      {leads.length > 0 ? (
         <LeadsTable
           workspace={workspace}
-          leads={filteredLeads}
+          leads={leads}
+          membersById={membersById}
           onEdit={openEditForm}
           onDelete={setLeadToDelete}
         />
@@ -141,11 +178,13 @@ function LeadsView({ workspace, initialLeads }: { workspace: string; initialLead
         open={formOpen}
         onOpenChange={setFormOpen}
         lead={editingLead}
+        members={members}
         onSubmit={handleSubmit}
       />
 
       <DeleteLeadDialog
         lead={leadToDelete}
+        isDeleting={isDeleting}
         onOpenChange={(open) => !open && setLeadToDelete(null)}
         onConfirm={handleDelete}
       />

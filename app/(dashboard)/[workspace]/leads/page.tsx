@@ -1,5 +1,6 @@
 import { LeadsView } from "@/components/leads/leads-view";
-import { mockLeads } from "@/lib/mock-data";
+import { listLeads } from "@/lib/actions/leads";
+import { getWorkspaceBySlug, listWorkspaceMembers } from "@/lib/workspace";
 
 export default async function LeadsPage({
   params,
@@ -7,6 +8,18 @@ export default async function LeadsPage({
   params: Promise<{ workspace: string }>;
 }) {
   const { workspace } = await params;
+  const workspaceRow = await getWorkspaceBySlug(workspace);
 
-  return <LeadsView workspace={workspace} initialLeads={mockLeads} />;
+  const [leadsResult, members] = await Promise.all([
+    listLeads(workspace),
+    listWorkspaceMembers(workspaceRow.id),
+  ]);
+
+  return (
+    <LeadsView
+      workspace={workspace}
+      initialLeads={leadsResult.success ? leadsResult.data : []}
+      members={members}
+    />
+  );
 }

@@ -23,7 +23,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { FileAttachmentsField } from "@/components/shared/file-attachments-field";
-import { leadStatuses, mockTeamMembers, type Anexo, type Lead, type LeadStatus } from "@/lib/mock-data";
+import type { Anexo } from "@/lib/mock-data";
+import { LEAD_STATUS_LABELS, LEAD_STATUS_OPTIONS } from "@/lib/labels";
+import type { Database, LeadStatus } from "@/lib/supabase/types";
+import type { WorkspaceMember } from "@/lib/workspace";
 import {
   validateLeadCompany,
   validateLeadEmail,
@@ -31,70 +34,107 @@ import {
   validateLeadPhone,
 } from "@/lib/validation/leads";
 
+type Lead = Database["public"]["Tables"]["leads"]["Row"];
+
 export type LeadFormValues = {
-  nome: string;
+  name: string;
   email: string;
-  telefone: string;
-  empresa: string;
-  cargo: string;
+  phone: string;
+  company: string;
+  job_title: string;
   status: LeadStatus;
-  responsavel: string;
-  valorNegociado: number;
-  notas: string;
-  anexos: Anexo[];
+  owner_id: string | null;
+  deal_value: number;
+  notes: string;
 };
 
-type FormErrors = Partial<Record<"nome" | "email" | "telefone" | "empresa", string>>;
-
-const emptyValues: LeadFormValues = {
-  nome: "",
-  email: "",
-  telefone: "",
-  empresa: "",
-  cargo: "",
-  status: "Novo",
-  responsavel: mockTeamMembers[0],
-  valorNegociado: 0,
-  notas: "",
-  anexos: [],
+export type LeadFormSubmitResult = {
+  success: boolean;
+  error?: string;
+  fieldErrors?: Record<string, string>;
 };
+
+type FormErrors = Partial<Record<"name" | "email" | "phone" | "company", string>>;
+
+const UNASSIGNED = "__unassigned__";
+
+function buildEmptyValues(): LeadFormValues {
+  return {
+    name: "",
+    email: "",
+    phone: "",
+    company: "",
+    job_title: "",
+    status: "novo",
+    owner_id: null,
+    deal_value: 0,
+    notes: "",
+  };
+}
 
 function LeadFormDialog({
   open,
   onOpenChange,
   lead,
+  members,
   onSubmit,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   lead?: Lead;
-  onSubmit: (values: LeadFormValues) => void;
+  members: WorkspaceMember[];
+  onSubmit: (values: LeadFormValues) => Promise<LeadFormSubmitResult>;
 }) {
   const formId = useId();
   const isEditing = !!lead;
 
-  const [values, setValues] = useState<LeadFormValues>(() => (lead ? { ...lead } : emptyValues));
+  const [values, setValues] = useState<LeadFormValues>(() =>
+    lead
+      ? {
+          name: lead.name,
+          email: lead.email ?? "",
+          phone: lead.phone ?? "",
+          company: lead.company ?? "",
+          job_title: lead.job_title ?? "",
+          status: lead.status,
+          owner_id: lead.owner_id,
+          deal_value: lead.deal_value ?? 0,
+          notes: lead.notes ?? "",
+        }
+      : buildEmptyValues(),
+  );
+  const [anexos, setAnexos] = useState<Anexo[]>([]);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [formError, setFormError] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const nextErrors: FormErrors = {
-      nome: validateLeadName(values.nome),
+      name: validateLeadName(values.name),
       email: validateLeadEmail(values.email),
-      telefone: validateLeadPhone(values.telefone),
-      empresa: validateLeadCompany(values.empresa),
+      phone: validateLeadPhone(values.phone),
+      company: validateLeadCompany(values.company),
     };
     setErrors(nextErrors);
+    setFormError(undefined);
 
     if (Object.values(nextErrors).some(Boolean)) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      onSubmit(values);
-      setIsSubmitting(false);
-    }, 400);
+    const result = await onSubmit(values);
+    setIsSubmitting(false);
+
+    if (!result.success) {
+      if (result.fieldErrors) {
+        setErrors((prev) => ({ ...prev, ...result.fieldErrors }));
+      }
+      setFormError(result.error);
+      return;
+    }
+
+    onOpenChange(false);
   }
 
   return (
@@ -111,16 +151,16 @@ function LeadFormDialog({
 
         <form id={formId} noValidate onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field data-invalid={!!errors.nome}>
-              <FieldLabel htmlFor="nome">Nome *</FieldLabel>
+            <Field data-invalid={!!errors.name}>
+              <FieldLabel htmlFor="name">Nome *</FieldLabel>
               <Input
-                id="nome"
+                id="name"
                 placeholder="Nome completo"
-                value={values.nome}
-                aria-invalid={!!errors.nome}
-                onChange={(event) => setValues((v) => ({ ...v, nome: event.target.value }))}
+                value={values.name}
+                aria-invalid={!!errors.name}
+                onChange={(event) => setValues((v) => ({ ...v, name: event.target.value }))}
               />
-              <FieldError>{errors.nome}</FieldError>
+              <FieldError>{errors.name}</FieldError>
             </Field>
 
             <Field data-invalid={!!errors.email}>
@@ -136,37 +176,37 @@ function LeadFormDialog({
               <FieldError>{errors.email}</FieldError>
             </Field>
 
-            <Field data-invalid={!!errors.telefone}>
-              <FieldLabel htmlFor="telefone">Telefone *</FieldLabel>
+            <Field data-invalid={!!errors.phone}>
+              <FieldLabel htmlFor="phone">Telefone *</FieldLabel>
               <Input
-                id="telefone"
+                id="phone"
                 placeholder="(11) 91234-5678"
-                value={values.telefone}
-                aria-invalid={!!errors.telefone}
-                onChange={(event) => setValues((v) => ({ ...v, telefone: event.target.value }))}
+                value={values.phone}
+                aria-invalid={!!errors.phone}
+                onChange={(event) => setValues((v) => ({ ...v, phone: event.target.value }))}
               />
-              <FieldError>{errors.telefone}</FieldError>
+              <FieldError>{errors.phone}</FieldError>
             </Field>
 
-            <Field data-invalid={!!errors.empresa}>
-              <FieldLabel htmlFor="empresa">Empresa *</FieldLabel>
+            <Field data-invalid={!!errors.company}>
+              <FieldLabel htmlFor="company">Empresa *</FieldLabel>
               <Input
-                id="empresa"
+                id="company"
                 placeholder="Nome da empresa"
-                value={values.empresa}
-                aria-invalid={!!errors.empresa}
-                onChange={(event) => setValues((v) => ({ ...v, empresa: event.target.value }))}
+                value={values.company}
+                aria-invalid={!!errors.company}
+                onChange={(event) => setValues((v) => ({ ...v, company: event.target.value }))}
               />
-              <FieldError>{errors.empresa}</FieldError>
+              <FieldError>{errors.company}</FieldError>
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="cargo">Cargo</FieldLabel>
+              <FieldLabel htmlFor="job_title">Cargo</FieldLabel>
               <Input
-                id="cargo"
+                id="job_title"
                 placeholder="Cargo do contato"
-                value={values.cargo}
-                onChange={(event) => setValues((v) => ({ ...v, cargo: event.target.value }))}
+                value={values.job_title}
+                onChange={(event) => setValues((v) => ({ ...v, job_title: event.target.value }))}
               />
             </Field>
 
@@ -174,15 +214,17 @@ function LeadFormDialog({
               <FieldLabel htmlFor="status">Status *</FieldLabel>
               <Select
                 value={values.status}
-                onValueChange={(status) => setValues((v) => ({ ...v, status: status as LeadStatus }))}
+                onValueChange={(status) =>
+                  setValues((v) => ({ ...v, status: (status as LeadStatus) ?? v.status }))
+                }
               >
                 <SelectTrigger id="status" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {leadStatuses.map((status) => (
+                  {LEAD_STATUS_OPTIONS.map((status) => (
                     <SelectItem key={status} value={status}>
-                      {status}
+                      {LEAD_STATUS_LABELS[status]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -190,20 +232,24 @@ function LeadFormDialog({
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="responsavel">Responsável *</FieldLabel>
+              <FieldLabel htmlFor="owner_id">Responsável</FieldLabel>
               <Select
-                value={values.responsavel}
-                onValueChange={(responsavel) =>
-                  setValues((v) => ({ ...v, responsavel: responsavel ?? v.responsavel }))
+                value={values.owner_id ?? UNASSIGNED}
+                onValueChange={(owner) =>
+                  setValues((v) => ({
+                    ...v,
+                    owner_id: !owner || owner === UNASSIGNED ? null : owner,
+                  }))
                 }
               >
-                <SelectTrigger id="responsavel" className="w-full">
+                <SelectTrigger id="owner_id" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockTeamMembers.map((member) => (
-                    <SelectItem key={member} value={member}>
-                      {member}
+                  <SelectItem value={UNASSIGNED}>Sem responsável</SelectItem>
+                  {members.map((member) => (
+                    <SelectItem key={member.user_id} value={member.user_id}>
+                      {member.email}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -211,39 +257,38 @@ function LeadFormDialog({
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="valorNegociado">Valor negociado (R$)</FieldLabel>
+              <FieldLabel htmlFor="deal_value">Valor negociado (R$)</FieldLabel>
               <Input
-                id="valorNegociado"
+                id="deal_value"
                 type="number"
                 min="0"
                 step="0.01"
                 placeholder="0"
-                value={values.valorNegociado === 0 ? "" : values.valorNegociado}
+                value={values.deal_value === 0 ? "" : values.deal_value}
                 onChange={(event) =>
-                  setValues((v) => ({ ...v, valorNegociado: Number(event.target.value) || 0 }))
+                  setValues((v) => ({ ...v, deal_value: Number(event.target.value) || 0 }))
                 }
               />
             </Field>
 
             <Field className="sm:col-span-2">
-              <FieldLabel htmlFor="notas">Notas</FieldLabel>
+              <FieldLabel htmlFor="notes">Notas</FieldLabel>
               <Textarea
-                id="notas"
+                id="notes"
                 placeholder="Detalhes sobre o lead ou pontos de lembrete..."
                 rows={3}
-                value={values.notas}
-                onChange={(event) => setValues((v) => ({ ...v, notas: event.target.value }))}
+                value={values.notes}
+                onChange={(event) => setValues((v) => ({ ...v, notes: event.target.value }))}
               />
             </Field>
 
             <Field className="sm:col-span-2">
               <FieldLabel>Anexos</FieldLabel>
-              <FileAttachmentsField
-                anexos={values.anexos}
-                onChange={(anexos) => setValues((v) => ({ ...v, anexos }))}
-              />
+              <FileAttachmentsField anexos={anexos} onChange={setAnexos} />
             </Field>
           </div>
+
+          {formError && <p className="mt-4 text-sm text-destructive">{formError}</p>}
         </form>
 
         <DialogFooter>

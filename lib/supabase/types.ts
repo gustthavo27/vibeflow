@@ -178,6 +178,10 @@ export interface Database {
         Args: { workspace_name: string; workspace_slug: string };
         Returns: Database["public"]["Tables"]["workspaces"]["Row"];
       };
+      list_workspace_members: {
+        Args: { target_workspace_id: string };
+        Returns: { user_id: string; email: string }[];
+      };
     };
   };
 }

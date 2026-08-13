@@ -1,11 +1,17 @@
 import { Briefcase, Percent, Users, Wallet } from "lucide-react";
 
-import { getDashboardMetrics } from "@/lib/dashboard-metrics";
 import { formatCurrency } from "@/lib/utils";
 import { MetricCard } from "./metric-card";
 
-function MetricsCards() {
-  const { totalLeads, openDeals, pipelineValue, conversionRate } = getDashboardMetrics();
+type Metrics = {
+  totalLeads: number;
+  openDeals: number;
+  pipelineValue: number;
+  conversionRate: number;
+};
+
+function MetricsCards({ metrics }: { metrics: Metrics }) {
+  const { totalLeads, openDeals, pipelineValue, conversionRate } = metrics;
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">

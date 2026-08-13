@@ -4,8 +4,13 @@ import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { CalendarClock } from "lucide-react";
 
+import { CLOSED_DEAL_STAGES } from "@/lib/labels";
 import { cn, formatCurrency } from "@/lib/utils";
-import type { Deal, Lead } from "@/lib/mock-data";
+import type { Database } from "@/lib/supabase/types";
+import type { WorkspaceMember } from "@/lib/workspace";
+
+type Deal = Database["public"]["Tables"]["deals"]["Row"];
+type Lead = Database["public"]["Tables"]["leads"]["Row"];
 
 const AVATAR_COLORS = [
   "bg-blue-500/20 text-blue-300",
@@ -34,32 +39,41 @@ function formatDate(value: string) {
   return new Date(value).toLocaleDateString("pt-BR", { timeZone: "UTC" });
 }
 
-const OVERDUE_EXEMPT_STAGES = new Set(["Fechado Ganho", "Fechado Perdido"]);
-
-function DealCardContent({ deal, lead, today }: { deal: Deal; lead: Lead | undefined; today: string }) {
-  const isOverdue = !OVERDUE_EXEMPT_STAGES.has(deal.etapa) && deal.prazo < today;
+function DealCardContent({
+  deal,
+  lead,
+  owner,
+  today,
+}: {
+  deal: Deal;
+  lead: Lead | undefined;
+  owner: WorkspaceMember | undefined;
+  today: string;
+}) {
+  const isOverdue =
+    !CLOSED_DEAL_STAGES.includes(deal.stage) && !!deal.due_date && deal.due_date < today;
 
   return (
     <>
-      <p className="font-medium text-foreground">{deal.titulo}</p>
+      <p className="font-medium text-foreground">{deal.title}</p>
 
       {lead && (
         <div className="flex items-center gap-2">
           <span
             className={cn(
               "flex size-6 shrink-0 items-center justify-center rounded-full text-[0.65rem] font-semibold",
-              avatarColorFor(lead.nome),
+              avatarColorFor(lead.name),
             )}
           >
-            {initialsFor(lead.nome)}
+            {initialsFor(lead.name)}
           </span>
           <span className="min-w-0 truncate text-xs text-muted-foreground">
-            {lead.nome} <span className="text-muted-foreground/60">·</span> {lead.empresa}
+            {lead.name} <span className="text-muted-foreground/60">·</span> {lead.company}
           </span>
         </div>
       )}
 
-      <p className="text-base font-bold text-foreground">{formatCurrency(deal.valorEstimado)}</p>
+      <p className="text-base font-bold text-foreground">{formatCurrency(deal.estimated_value)}</p>
 
       <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
         <span
@@ -69,12 +83,14 @@ function DealCardContent({ deal, lead, today }: { deal: Deal; lead: Lead | undef
           )}
         >
           <CalendarClock className="size-3.5 shrink-0" />
-          {formatDate(deal.prazo)}
+          {deal.due_date ? formatDate(deal.due_date) : "Sem prazo"}
           {isOverdue && <span className="font-mono uppercase">· Vencido</span>}
         </span>
-        <span className="font-mono text-[0.65rem] font-medium tracking-wide text-muted-foreground uppercase">
-          {deal.responsavel.split(" ")[0]}
-        </span>
+        {owner && (
+          <span className="font-mono text-[0.65rem] font-medium tracking-wide text-muted-foreground uppercase">
+            {owner.email.split("@")[0]}
+          </span>
+        )}
       </div>
     </>
   );
@@ -83,17 +99,19 @@ function DealCardContent({ deal, lead, today }: { deal: Deal; lead: Lead | undef
 function DealCard({
   deal,
   lead,
+  owner,
   onClick,
   today,
 }: {
   deal: Deal;
   lead: Lead | undefined;
+  owner: WorkspaceMember | undefined;
   onClick: () => void;
   today: string;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: deal.id,
-    data: { stage: deal.etapa },
+    data: { stage: deal.stage },
   });
 
   const style = transform ? { transform: CSS.Translate.toString(transform) } : undefined;
@@ -112,15 +130,25 @@ function DealCard({
         isDragging && "z-10 opacity-50 shadow-lg",
       )}
     >
-      <DealCardContent deal={deal} lead={lead} today={today} />
+      <DealCardContent deal={deal} lead={lead} owner={owner} today={today} />
     </div>
   );
 }
 
-function DealCardPreview({ deal, lead, today }: { deal: Deal; lead: Lead | undefined; today: string }) {
+function DealCardPreview({
+  deal,
+  lead,
+  owner,
+  today,
+}: {
+  deal: Deal;
+  lead: Lead | undefined;
+  owner: WorkspaceMember | undefined;
+  today: string;
+}) {
   return (
     <div className="flex cursor-grabbing flex-col gap-2.5 rounded-xl bg-card p-3 text-sm shadow-lg ring-1 ring-foreground/20">
-      <DealCardContent deal={deal} lead={lead} today={today} />
+      <DealCardContent deal={deal} lead={lead} owner={owner} today={today} />
     </div>
   );
 }

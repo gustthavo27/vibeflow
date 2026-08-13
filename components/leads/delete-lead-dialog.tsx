@@ -10,16 +10,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import type { Lead } from "@/lib/mock-data";
+import type { Database } from "@/lib/supabase/types";
+
+type Lead = Database["public"]["Tables"]["leads"]["Row"];
 
 function DeleteLeadDialog({
   lead,
   onOpenChange,
   onConfirm,
+  isDeleting,
 }: {
   lead: Lead | null;
   onOpenChange: (open: boolean) => void;
   onConfirm: (lead: Lead) => void;
+  isDeleting?: boolean;
 }) {
   return (
     <AlertDialog open={!!lead} onOpenChange={onOpenChange}>
@@ -27,16 +31,17 @@ function DeleteLeadDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Excluir lead</AlertDialogTitle>
           <AlertDialogDescription>
-            Tem certeza que deseja excluir {lead?.nome}? Essa ação não pode ser desfeita.
+            Tem certeza que deseja excluir {lead?.name}? Essa ação não pode ser desfeita.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
           <AlertDialogAction
             className="bg-destructive text-white hover:bg-destructive/90"
+            disabled={isDeleting}
             onClick={() => lead && onConfirm(lead)}
           >
-            Excluir
+            {isDeleting ? "Excluindo..." : "Excluir"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

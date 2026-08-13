@@ -13,7 +13,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { LeadStatusBadge } from "@/components/leads/lead-status-badge";
-import type { Lead } from "@/lib/mock-data";
+import type { Database } from "@/lib/supabase/types";
+import type { WorkspaceMember } from "@/lib/workspace";
+
+type Lead = Database["public"]["Tables"]["leads"]["Row"];
 
 function formatDate(value: string) {
   return new Date(value).toLocaleDateString("pt-BR", { timeZone: "UTC" });
@@ -22,11 +25,13 @@ function formatDate(value: string) {
 function LeadsTable({
   workspace,
   leads,
+  membersById,
   onEdit,
   onDelete,
 }: {
   workspace: string;
   leads: Lead[];
+  membersById: Map<string, WorkspaceMember>;
   onEdit: (lead: Lead) => void;
   onDelete: (lead: Lead) => void;
 }) {
@@ -51,27 +56,29 @@ function LeadsTable({
                   href={`/${workspace}/leads/${lead.id}`}
                   className="flex flex-col hover:underline"
                 >
-                  <span className="font-medium text-foreground">{lead.nome}</span>
+                  <span className="font-medium text-foreground">{lead.name}</span>
                   <span className="text-xs text-muted-foreground">{lead.email}</span>
                 </Link>
               </TableCell>
               <TableCell>
                 <div className="flex flex-col">
-                  <span className="text-foreground">{lead.empresa}</span>
-                  <span className="text-xs text-muted-foreground">{lead.cargo}</span>
+                  <span className="text-foreground">{lead.company}</span>
+                  <span className="text-xs text-muted-foreground">{lead.job_title}</span>
                 </div>
               </TableCell>
               <TableCell>
                 <LeadStatusBadge status={lead.status} />
               </TableCell>
-              <TableCell className="text-muted-foreground">{lead.responsavel}</TableCell>
-              <TableCell className="text-muted-foreground">{formatDate(lead.criadoEm)}</TableCell>
+              <TableCell className="text-muted-foreground">
+                {lead.owner_id ? (membersById.get(lead.owner_id)?.email ?? "—") : "—"}
+              </TableCell>
+              <TableCell className="text-muted-foreground">{formatDate(lead.created_at)}</TableCell>
               <TableCell>
                 <div className="flex justify-end gap-1">
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Editar ${lead.nome}`}
+                    aria-label={`Editar ${lead.name}`}
                     onClick={() => onEdit(lead)}
                   >
                     <Pencil />
@@ -79,7 +86,7 @@ function LeadsTable({
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Excluir ${lead.nome}`}
+                    aria-label={`Excluir ${lead.name}`}
                     onClick={() => onDelete(lead)}
                   >
                     <Trash2 />
