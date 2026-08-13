@@ -74,9 +74,9 @@
 - [x] Página de detalhe do lead (perfil completo, com edição direta)
 - [x] Componente de upload de arquivos (UI, sem persistência)
 - [x] Timeline cronológica de atividades no detalhe do lead (visual, somente leitura)
-- [ ] Formulário de nova atividade (tipo: Ligação, E-mail, Reunião, Nota)
+- [x] Formulário de nova atividade (tipo: Ligação, E-mail, Reunião, Nota)
 - [x] Exibição de autor, descrição e data por item da timeline
-- [ ] Filtro por tipo de atividade
+- [x] Filtro por tipo de atividade
 
 **Commit final**: `feat: listagem, filtros, detalhe de leads e timeline de atividades com dados mockados`
 
@@ -156,56 +156,31 @@
 
 ---
 
-## Milestone 8 — Backend: Leads e Contatos
+## Milestone 8 — Backend: Leads, Pipeline, Atividades e Dashboard
 
-**Branch**: `feature/backend-leads`
+**Branch**: `feature/backend-core`
 
-**Objetivo**: Conectar a UI de leads (Milestone 3) a Server Actions com persistência real no Supabase.
+**Objetivo**: Conectar a UI de leads (Milestone 3), pipeline Kanban (Milestone 4), timeline de atividades (Milestone 3) e dashboard de métricas (Milestone 5) a Server Actions com persistência real no Supabase.
 
 **Entregas**:
-- [ ] Server Actions: criar, listar, atualizar, excluir lead
-- [ ] Busca e filtros server-side
-- [ ] Upload de arquivos real (Supabase Storage) vinculado ao lead
-- [ ] Validação de dados no servidor
-- [ ] Testes das Server Actions
+- [x] Server Actions: criar, listar, atualizar, excluir lead
+- [x] Busca e filtros server-side (leads)
+- [ ] Upload de arquivos real (Supabase Storage) vinculado ao lead — adiado; `file-attachments-field.tsx` permanece mock/local, fora do escopo deste milestone
+- [x] Server Actions: criar, listar, atualizar (etapa/campos), excluir negócio
+- [x] Persistência da posição/etapa ao soltar o card (drag-and-drop)
+- [x] Vínculo negócio ↔ lead ↔ responsável real
+- [x] Server Actions: criar e listar atividades por lead
+- [x] Queries de métricas reais (total de leads, negócios abertos, valor do pipeline, taxa de conversão)
+- [x] Query do funil de vendas para o gráfico Recharts
+- [x] Query de negócios com prazo próximo por usuário
+- [x] Validação de dados no servidor
+- [x] Testes das Server Actions
 
-**Commit final**: `feat: CRUD de leads persistido no Supabase com upload de arquivos`
+**Commit final**: `feat: backend real de leads, pipeline, atividades e dashboard com persistência no Supabase`
 
 ---
 
-## Milestone 9 — Backend: Pipeline Kanban
-
-**Branch**: `feature/backend-pipeline`
-
-**Objetivo**: Conectar o board Kanban (Milestone 4) à persistência real, incluindo a atualização de etapa via drag-and-drop.
-
-**Entregas**:
-- [ ] Server Actions: criar, listar, atualizar (etapa/campos), excluir negócio
-- [ ] Persistência da posição/etapa ao soltar o card (drag-and-drop)
-- [ ] Vínculo negócio ↔ lead ↔ responsável real
-- [ ] Testes das Server Actions
-
-**Commit final**: `feat: persistência real do pipeline Kanban com atualização de etapa via drag-and-drop`
-
----
-
-## Milestone 10 — Backend: Atividades e Dashboard de Métricas
-
-**Branch**: `feature/backend-activities-metrics`
-
-**Objetivo**: Conectar a timeline de atividades (Milestone 3) e o dashboard de métricas (Milestone 5) a dados reais.
-
-**Entregas**:
-- [ ] Server Actions: criar e listar atividades por lead
-- [ ] Queries de métricas reais (total de leads, negócios abertos, valor do pipeline, taxa de conversão)
-- [ ] Query do funil de vendas para o gráfico Recharts
-- [ ] Query de negócios com prazo próximo por usuário
-
-**Commit final**: `feat: atividades e métricas do dashboard com dados reais do Supabase`
-
----
-
-## Milestone 11 — Multi-empresa e Colaboração
+## Milestone 9 — Multi-empresa e Colaboração
 
 **Branch**: `feature/workspaces-collaboration`
 
@@ -223,7 +198,7 @@
 
 ---
 
-## Milestone 12 — Monetização (Stripe)
+## Milestone 10 — Monetização (Stripe)
 
 **Branch**: `feature/stripe-billing`
 
@@ -241,7 +216,7 @@
 
 ---
 
-## Milestone 13 — QA, Polimento e Deploy
+## Milestone 11 — QA, Polimento e Deploy
 
 **Branch**: `chore/release-v1`
 

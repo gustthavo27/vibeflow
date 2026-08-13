@@ -1,10 +1,10 @@
-import type { DealStage } from "@/lib/mock-data";
+import type { DealStage } from "@/lib/supabase/types";
 
 export const stageDotClasses: Record<DealStage, string> = {
-  "Novo Lead": "bg-blue-500",
-  "Contato Realizado": "bg-cyan-400",
-  "Proposta Enviada": "bg-fuchsia-500",
-  Negociação: "bg-amber-500",
-  "Fechado Ganho": "bg-emerald-400",
-  "Fechado Perdido": "bg-red-500",
+  novo_lead: "bg-blue-500",
+  contato_realizado: "bg-cyan-400",
+  proposta_enviada: "bg-fuchsia-500",
+  negociacao: "bg-amber-500",
+  fechado_ganho: "bg-emerald-400",
+  fechado_perdido: "bg-red-500",
 };

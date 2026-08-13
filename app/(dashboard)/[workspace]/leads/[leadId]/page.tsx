@@ -3,7 +3,9 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 import { LeadDetailView } from "@/components/leads/lead-detail-view";
-import { mockActivities, mockLeads } from "@/lib/mock-data";
+import { getLead } from "@/lib/actions/leads";
+import { listActivities } from "@/lib/actions/activities";
+import { getWorkspaceBySlug, listWorkspaceMembers } from "@/lib/workspace";
 
 export default async function LeadDetailPage({
   params,
@@ -11,13 +13,18 @@ export default async function LeadDetailPage({
   params: Promise<{ workspace: string; leadId: string }>;
 }) {
   const { workspace, leadId } = await params;
-  const lead = mockLeads.find((item) => item.id === leadId);
+  const workspaceRow = await getWorkspaceBySlug(workspace);
 
-  if (!lead) {
+  const leadResult = await getLead(workspace, leadId);
+
+  if (!leadResult.success) {
     notFound();
   }
 
-  const activities = mockActivities.filter((activity) => activity.leadId === lead.id);
+  const [activitiesResult, members] = await Promise.all([
+    listActivities(workspace, leadId),
+    listWorkspaceMembers(workspaceRow.id),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -31,7 +38,12 @@ export default async function LeadDetailPage({
         </Link>
       </div>
 
-      <LeadDetailView initialLead={lead} activities={activities} />
+      <LeadDetailView
+        workspace={workspace}
+        initialLead={leadResult.data}
+        activities={activitiesResult.success ? activitiesResult.data : []}
+        members={members}
+      />
     </div>
   );
 }

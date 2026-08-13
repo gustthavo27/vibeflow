@@ -29,34 +29,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { FileAttachmentsField } from "@/components/shared/file-attachments-field";
-import {
-  dealStages,
-  mockLeads,
-  mockTeamMembers,
-  type Anexo,
-  type Deal,
-  type DealStage,
-  type Lead,
-} from "@/lib/mock-data";
+import type { Anexo } from "@/lib/mock-data";
+import { DEAL_STAGE_LABELS, DEAL_STAGE_OPTIONS } from "@/lib/labels";
+import type { Database, DealStage } from "@/lib/supabase/types";
+import type { WorkspaceMember } from "@/lib/workspace";
+
+type Deal = Database["public"]["Tables"]["deals"]["Row"];
+type Lead = Database["public"]["Tables"]["leads"]["Row"];
 
 function leadLabel(lead: Lead) {
-  return `${lead.nome} — ${lead.empresa}`;
+  return `${lead.name} — ${lead.company ?? "sem empresa"}`;
 }
 
 export type DealFormValues = {
-  titulo: string;
-  valorEstimado: number;
-  leadId: string;
-  responsavel: string;
-  prazo: string;
-  etapa: DealStage;
-  notas: string;
-  anexos: Anexo[];
+  title: string;
+  estimated_value: number;
+  lead_id: string | null;
+  owner_id: string | null;
+  due_date: string | null;
+  stage: DealStage;
 };
 
-type FormErrors = Partial<Record<"titulo" | "leadId" | "prazo", string>>;
+export type DealFormSubmitResult = {
+  success: boolean;
+  error?: string;
+  fieldErrors?: Record<string, string>;
+};
+
+type FormErrors = Partial<Record<"title" | "lead_id" | "due_date", string>>;
+
+const UNASSIGNED = "__unassigned__";
 
 function isoToDisplayDate(iso: string) {
   const [year, month, day] = iso.split("-");
@@ -82,16 +85,14 @@ function maskDateInput(raw: string) {
   return [digits.slice(0, 2), digits.slice(2, 4), digits.slice(4, 8)].filter(Boolean).join("/");
 }
 
-function buildEmptyValues(defaultStage: DealStage): DealFormValues {
+function buildEmptyValues(defaultStage: DealStage, defaultLeadId: string | null): DealFormValues {
   return {
-    titulo: "",
-    valorEstimado: 0,
-    leadId: mockLeads[0]?.id ?? "",
-    responsavel: mockTeamMembers[0],
-    prazo: "",
-    etapa: defaultStage,
-    notas: "",
-    anexos: [],
+    title: "",
+    estimated_value: 0,
+    lead_id: defaultLeadId,
+    owner_id: null,
+    due_date: null,
+    stage: defaultStage,
   };
 }
 
@@ -100,47 +101,70 @@ function DealFormDialog({
   onOpenChange,
   deal,
   defaultStage,
+  leads,
+  members,
   onSubmit,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   deal?: Deal;
   defaultStage: DealStage;
-  onSubmit: (values: DealFormValues) => void;
+  leads: Lead[];
+  members: WorkspaceMember[];
+  onSubmit: (values: DealFormValues) => Promise<DealFormSubmitResult>;
 }) {
   const formId = useId();
   const isEditing = !!deal;
 
   const [values, setValues] = useState<DealFormValues>(() =>
-    deal ? { ...deal } : buildEmptyValues(defaultStage),
+    deal
+      ? {
+          title: deal.title,
+          estimated_value: deal.estimated_value,
+          lead_id: deal.lead_id,
+          owner_id: deal.owner_id,
+          due_date: deal.due_date,
+          stage: deal.stage,
+        }
+      : buildEmptyValues(defaultStage, leads[0]?.id ?? null),
   );
-  const [prazoText, setPrazoText] = useState(() => isoToDisplayDate(deal?.prazo ?? ""));
+  const [anexos, setAnexos] = useState<Anexo[]>([]);
+  const [prazoText, setPrazoText] = useState(() => isoToDisplayDate(deal?.due_date ?? ""));
   const [errors, setErrors] = useState<FormErrors>({});
+  const [formError, setFormError] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handlePrazoChange(event: ChangeEvent<HTMLInputElement>) {
     const masked = maskDateInput(event.target.value);
     setPrazoText(masked);
-    setValues((v) => ({ ...v, prazo: displayDateToIso(masked) }));
+    setValues((v) => ({ ...v, due_date: displayDateToIso(masked) || null }));
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const nextErrors: FormErrors = {
-      titulo: values.titulo.trim() ? undefined : "Informe o título do negócio.",
-      leadId: values.leadId ? undefined : "Selecione um lead vinculado.",
-      prazo: values.prazo ? undefined : "Informe o prazo do negócio.",
+      title: values.title.trim() ? undefined : "Informe o título do negócio.",
+      lead_id: values.lead_id ? undefined : "Selecione um lead vinculado.",
     };
     setErrors(nextErrors);
+    setFormError(undefined);
 
     if (Object.values(nextErrors).some(Boolean)) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      onSubmit(values);
-      setIsSubmitting(false);
-    }, 400);
+    const result = await onSubmit(values);
+    setIsSubmitting(false);
+
+    if (!result.success) {
+      if (result.fieldErrors) {
+        setErrors((prev) => ({ ...prev, ...result.fieldErrors }));
+      }
+      setFormError(result.error);
+      return;
+    }
+
+    onOpenChange(false);
   }
 
   return (
@@ -157,32 +181,32 @@ function DealFormDialog({
 
         <form id={formId} noValidate onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field className="sm:col-span-2" data-invalid={!!errors.titulo}>
-              <FieldLabel htmlFor="titulo">Título *</FieldLabel>
+            <Field className="sm:col-span-2" data-invalid={!!errors.title}>
+              <FieldLabel htmlFor="title">Título *</FieldLabel>
               <Input
-                id="titulo"
+                id="title"
                 placeholder="Ex.: Proposta Enterprise - Norte Tech"
-                value={values.titulo}
-                aria-invalid={!!errors.titulo}
-                onChange={(event) => setValues((v) => ({ ...v, titulo: event.target.value }))}
+                value={values.title}
+                aria-invalid={!!errors.title}
+                onChange={(event) => setValues((v) => ({ ...v, title: event.target.value }))}
               />
-              <FieldError>{errors.titulo}</FieldError>
+              <FieldError>{errors.title}</FieldError>
             </Field>
 
-            <Field data-invalid={!!errors.leadId}>
-              <FieldLabel htmlFor="leadId">Lead vinculado *</FieldLabel>
+            <Field data-invalid={!!errors.lead_id}>
+              <FieldLabel htmlFor="lead_id">Lead vinculado *</FieldLabel>
               <Combobox
-                items={mockLeads}
+                items={leads}
                 itemToStringLabel={leadLabel}
-                value={mockLeads.find((lead) => lead.id === values.leadId) ?? null}
+                value={leads.find((lead) => lead.id === values.lead_id) ?? null}
                 onValueChange={(lead) =>
-                  setValues((v) => ({ ...v, leadId: lead?.id ?? "" }))
+                  setValues((v) => ({ ...v, lead_id: (lead as Lead | null)?.id ?? null }))
                 }
               >
                 <ComboboxInput
-                  id="leadId"
+                  id="lead_id"
                   placeholder="Buscar por nome ou empresa..."
-                  aria-invalid={!!errors.leadId}
+                  aria-invalid={!!errors.lead_id}
                   showClear
                   className="w-full"
                 />
@@ -192,9 +216,9 @@ function DealFormDialog({
                     {(lead: Lead) => (
                       <ComboboxItem key={lead.id} value={lead}>
                         <div className="flex min-w-0 flex-col">
-                          <span className="truncate">{lead.nome}</span>
+                          <span className="truncate">{lead.name}</span>
                           <span className="truncate text-xs text-muted-foreground">
-                            {lead.empresa}
+                            {lead.company}
                           </span>
                         </div>
                       </ComboboxItem>
@@ -202,24 +226,24 @@ function DealFormDialog({
                   </ComboboxList>
                 </ComboboxContent>
               </Combobox>
-              <FieldError>{errors.leadId}</FieldError>
+              <FieldError>{errors.lead_id}</FieldError>
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="etapa">Etapa *</FieldLabel>
+              <FieldLabel htmlFor="stage">Etapa *</FieldLabel>
               <Select
-                value={values.etapa}
-                onValueChange={(etapa) =>
-                  setValues((v) => ({ ...v, etapa: (etapa as DealStage) ?? v.etapa }))
+                value={values.stage}
+                onValueChange={(stage) =>
+                  setValues((v) => ({ ...v, stage: (stage as DealStage) ?? v.stage }))
                 }
               >
-                <SelectTrigger id="etapa" className="w-full">
+                <SelectTrigger id="stage" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {dealStages.map((stage) => (
+                  {DEAL_STAGE_OPTIONS.map((stage) => (
                     <SelectItem key={stage} value={stage}>
-                      {stage}
+                      {DEAL_STAGE_LABELS[stage]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -227,50 +251,54 @@ function DealFormDialog({
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="valorEstimado">Valor estimado (R$)</FieldLabel>
+              <FieldLabel htmlFor="estimated_value">Valor estimado (R$)</FieldLabel>
               <Input
-                id="valorEstimado"
+                id="estimated_value"
                 type="number"
                 min="0"
                 step="0.01"
                 placeholder="0"
-                value={values.valorEstimado === 0 ? "" : values.valorEstimado}
+                value={values.estimated_value === 0 ? "" : values.estimated_value}
                 onChange={(event) =>
-                  setValues((v) => ({ ...v, valorEstimado: Number(event.target.value) || 0 }))
+                  setValues((v) => ({ ...v, estimated_value: Number(event.target.value) || 0 }))
                 }
               />
             </Field>
 
-            <Field data-invalid={!!errors.prazo}>
-              <FieldLabel htmlFor="prazo">Prazo *</FieldLabel>
+            <Field data-invalid={!!errors.due_date}>
+              <FieldLabel htmlFor="due_date">Prazo</FieldLabel>
               <Input
-                id="prazo"
+                id="due_date"
                 type="text"
                 inputMode="numeric"
                 placeholder="dd/mm/aaaa"
                 maxLength={10}
                 value={prazoText}
-                aria-invalid={!!errors.prazo}
+                aria-invalid={!!errors.due_date}
                 onChange={handlePrazoChange}
               />
-              <FieldError>{errors.prazo}</FieldError>
+              <FieldError>{errors.due_date}</FieldError>
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="responsavel">Responsável *</FieldLabel>
+              <FieldLabel htmlFor="owner_id">Responsável</FieldLabel>
               <Select
-                value={values.responsavel}
-                onValueChange={(responsavel) =>
-                  setValues((v) => ({ ...v, responsavel: responsavel ?? v.responsavel }))
+                value={values.owner_id ?? UNASSIGNED}
+                onValueChange={(owner) =>
+                  setValues((v) => ({
+                    ...v,
+                    owner_id: !owner || owner === UNASSIGNED ? null : owner,
+                  }))
                 }
               >
-                <SelectTrigger id="responsavel" className="w-full">
+                <SelectTrigger id="owner_id" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockTeamMembers.map((member) => (
-                    <SelectItem key={member} value={member}>
-                      {member}
+                  <SelectItem value={UNASSIGNED}>Sem responsável</SelectItem>
+                  {members.map((member) => (
+                    <SelectItem key={member.user_id} value={member.user_id}>
+                      {member.email}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -278,24 +306,12 @@ function DealFormDialog({
             </Field>
 
             <Field className="sm:col-span-2">
-              <FieldLabel htmlFor="notas">Notas</FieldLabel>
-              <Textarea
-                id="notas"
-                placeholder="Detalhes sobre a negociação..."
-                rows={3}
-                value={values.notas}
-                onChange={(event) => setValues((v) => ({ ...v, notas: event.target.value }))}
-              />
-            </Field>
-
-            <Field className="sm:col-span-2">
               <FieldLabel>Anexos</FieldLabel>
-              <FileAttachmentsField
-                anexos={values.anexos}
-                onChange={(anexos) => setValues((v) => ({ ...v, anexos }))}
-              />
+              <FileAttachmentsField anexos={anexos} onChange={setAnexos} />
             </Field>
           </div>
+
+          {formError && <p className="mt-4 text-sm text-destructive">{formError}</p>}
         </form>
 
         <DialogFooter>
