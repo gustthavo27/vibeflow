@@ -9,11 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { validateEmail, validatePassword } from "@/lib/validation/auth";
-import { mockWorkspaces } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/client";
+import { translateAuthError } from "@/lib/supabase/auth-errors";
 
 type FormErrors = {
   email?: string;
   password?: string;
+  form?: string;
 };
 
 function LoginForm() {
@@ -23,7 +25,7 @@ function LoginForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const nextErrors: FormErrors = {
@@ -35,14 +37,37 @@ function LoginForm() {
     if (nextErrors.email || nextErrors.password) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      router.push(`/${mockWorkspaces[0].slug}`);
-    }, 800);
+
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error || !data.user) {
+      setErrors({ form: translateAuthError(error?.message ?? "") });
+      setIsSubmitting(false);
+      return;
+    }
+
+    const { data: membership } = await supabase
+      .from("workspace_members")
+      .select("workspaces(slug)")
+      .eq("user_id", data.user.id)
+      .limit(1)
+      .maybeSingle();
+
+    const workspaceSlug = (membership?.workspaces as { slug?: string } | null)?.slug;
+    router.push(workspaceSlug ? `/${workspaceSlug}` : "/onboarding");
+    router.refresh();
   }
 
   return (
     <form noValidate onSubmit={handleSubmit}>
       <FieldGroup>
+        {errors.form && (
+          <div role="alert" className="text-sm font-medium text-destructive">
+            {errors.form}
+          </div>
+        )}
+
         <Field data-invalid={!!errors.email}>
           <FieldLabel htmlFor="email">E-mail</FieldLabel>
           <Input

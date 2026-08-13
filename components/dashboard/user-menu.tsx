@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronsUpDown, LogOut, Settings, User } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -15,9 +15,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { mockCurrentUser } from "@/lib/mock-data";
+import { createClient } from "@/lib/supabase/client";
 
 function UserMenu({ variant = "topbar" }: { variant?: "topbar" | "sidebar" }) {
+  const router = useRouter();
   const firstName = mockCurrentUser.name.split(" ")[0];
+
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
 
   return (
     <DropdownMenu>
@@ -74,7 +83,7 @@ function UserMenu({ variant = "topbar" }: { variant?: "topbar" | "sidebar" }) {
           Configurações
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" render={<Link href="/login" />}>
+        <DropdownMenuItem variant="destructive" onClick={handleLogout}>
           <LogOut className="size-4" />
           Sair
         </DropdownMenuItem>

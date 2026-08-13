@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { slugify, validateWorkspaceName } from "@/lib/validation/auth";
+import { createClient } from "@/lib/supabase/client";
 
 function OnboardingForm() {
   const router = useRouter();
@@ -15,7 +16,7 @@ function OnboardingForm() {
   const [error, setError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const nextError = validateWorkspaceName(workspaceName);
@@ -24,9 +25,25 @@ function OnboardingForm() {
     if (nextError) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      router.push(`/${slugify(workspaceName)}`);
-    }, 800);
+
+    const supabase = createClient();
+    const { data, error: rpcError } = await supabase.rpc("create_workspace_with_owner", {
+      workspace_name: workspaceName,
+      workspace_slug: slugify(workspaceName),
+    });
+
+    if (rpcError || !data) {
+      setError(
+        rpcError?.message.includes("duplicate key")
+          ? "Já existe um workspace com esse nome. Escolha outro."
+          : "Não foi possível criar o workspace. Tente novamente.",
+      );
+      setIsSubmitting(false);
+      return;
+    }
+
+    router.push(`/${data.slug}`);
+    router.refresh();
   }
 
   return (

@@ -13,12 +13,15 @@ import {
   validateName,
   validatePassword,
 } from "@/lib/validation/auth";
+import { createClient } from "@/lib/supabase/client";
+import { translateAuthError } from "@/lib/supabase/auth-errors";
 
 type FormErrors = {
   name?: string;
   email?: string;
   password?: string;
   confirmPassword?: string;
+  form?: string;
 };
 
 function SignupForm() {
@@ -29,8 +32,9 @@ function SignupForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmationSent, setConfirmationSent] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const nextErrors: FormErrors = {
@@ -44,14 +48,49 @@ function SignupForm() {
     if (Object.values(nextErrors).some(Boolean)) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      router.push("/onboarding");
-    }, 800);
+
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: name } },
+    });
+
+    if (error) {
+      setErrors({ form: translateAuthError(error.message) });
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!data.session) {
+      // Confirmação de e-mail está habilitada no projeto Supabase — não há sessão ainda.
+      setConfirmationSent(true);
+      setIsSubmitting(false);
+      return;
+    }
+
+    router.push("/onboarding");
+    router.refresh();
+  }
+
+  if (confirmationSent) {
+    return (
+      <p className="text-center text-sm text-muted-foreground">
+        Enviamos um link de confirmação para <strong>{email}</strong>. Verifique sua caixa de
+        entrada para ativar sua conta.
+      </p>
+    );
   }
 
   return (
     <form noValidate onSubmit={handleSubmit}>
       <FieldGroup>
+        {errors.form && (
+          <div role="alert" className="text-sm font-medium text-destructive">
+            {errors.form}
+          </div>
+        )}
+
         <Field data-invalid={!!errors.name}>
           <FieldLabel htmlFor="name">Nome</FieldLabel>
           <Input
