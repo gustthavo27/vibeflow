@@ -133,42 +133,30 @@
 
 ---
 
-## Milestone 7 — Backend: Supabase Setup e Schema
+## Milestone 7 — Backend: Supabase Setup, Schema e Autenticação Real
 
-**Branch**: `feature/backend-supabase-setup`
+**Branch**: `feat/supabase-core`
 
-**Objetivo**: Configurar o Supabase (projeto, schema do banco, RLS) e os clients de acesso a dados, sem ainda plugar nas telas.
+**Objetivo**: Configurar o Supabase (projeto, schema do banco, RLS) e os clients de acesso a dados, e substituir os mocks de autenticação pelas chamadas reais ao Supabase Auth, conectando às telas do Milestone 2.
 
 **Entregas**:
-- [ ] Criar projeto Supabase e configurar variáveis de ambiente
-- [ ] Modelagem do schema: `workspaces`, `workspace_members`, `leads`, `deals`, `activities`
-- [ ] Políticas de Row Level Security (RLS) por workspace
-- [ ] `lib/supabase/server.ts` e `lib/supabase/client.ts`
-- [ ] Geração de tipos TypeScript a partir do schema Supabase
-- [ ] Seed de dados de teste
+- [x] Criar projeto Supabase e configurar variáveis de ambiente
+- [x] Modelagem do schema: `workspaces`, `workspace_members`, `leads`, `deals`, `activities`
+- [x] Políticas de Row Level Security (RLS) por workspace
+- [x] `lib/supabase/server.ts` e `lib/supabase/client.ts`
+- [x] Geração de tipos TypeScript a partir do schema Supabase
+- [x] Seed de dados de teste
+- [x] Integração de login/cadastro com Supabase Auth
+- [x] Middleware/proteção de rotas autenticadas (`proxy.ts`, renomeado no Next.js 16)
+- [x] Fluxo real de onboarding (criação de workspace no banco)
+- [x] Sessão e logout funcionais
+- [x] Tratamento de erros de autenticação
 
-**Commit final**: `feat: schema Supabase com RLS multi-tenant e clients server/browser`
+**Commit final**: `feat: schema Supabase com RLS multi-tenant, clients server/browser e autenticação real via Supabase Auth`
 
 ---
 
-## Milestone 8 — Backend: Autenticação Real
-
-**Branch**: `feature/backend-auth`
-
-**Objetivo**: Substituir os mocks de autenticação pelas chamadas reais ao Supabase Auth, conectando às telas do Milestone 2.
-
-**Entregas**:
-- [ ] Integração de login/cadastro com Supabase Auth
-- [ ] Middleware/proteção de rotas autenticadas
-- [ ] Fluxo real de onboarding (criação de workspace no banco)
-- [ ] Sessão e logout funcionais
-- [ ] Tratamento de erros de autenticação
-
-**Commit final**: `feat: autenticação real via Supabase Auth conectada às telas de login/onboarding`
-
----
-
-## Milestone 9 — Backend: Leads e Contatos
+## Milestone 8 — Backend: Leads e Contatos
 
 **Branch**: `feature/backend-leads`
 
@@ -185,7 +173,7 @@
 
 ---
 
-## Milestone 10 — Backend: Pipeline Kanban
+## Milestone 9 — Backend: Pipeline Kanban
 
 **Branch**: `feature/backend-pipeline`
 
@@ -201,7 +189,7 @@
 
 ---
 
-## Milestone 11 — Backend: Atividades e Dashboard de Métricas
+## Milestone 10 — Backend: Atividades e Dashboard de Métricas
 
 **Branch**: `feature/backend-activities-metrics`
 
@@ -217,7 +205,7 @@
 
 ---
 
-## Milestone 12 — Multi-empresa e Colaboração
+## Milestone 11 — Multi-empresa e Colaboração
 
 **Branch**: `feature/workspaces-collaboration`
 
@@ -235,7 +223,7 @@
 
 ---
 
-## Milestone 13 — Monetização (Stripe)
+## Milestone 12 — Monetização (Stripe)
 
 **Branch**: `feature/stripe-billing`
 
@@ -253,7 +241,7 @@
 
 ---
 
-## Milestone 14 — QA, Polimento e Deploy
+## Milestone 13 — QA, Polimento e Deploy
 
 **Branch**: `chore/release-v1`
 
