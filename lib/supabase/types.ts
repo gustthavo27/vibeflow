@@ -4,6 +4,8 @@
 
 export type WorkspaceRole = "admin" | "member";
 
+export type WorkspaceInviteStatus = "pending" | "accepted" | "revoked";
+
 export type LeadStatus =
   | "novo"
   | "contato_realizado"
@@ -141,6 +143,40 @@ export interface Database {
           },
         ];
       };
+      workspace_invites: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          email: string;
+          role: WorkspaceRole;
+          invited_by: string | null;
+          token: string;
+          status: WorkspaceInviteStatus;
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          email: string;
+          role?: WorkspaceRole;
+          invited_by?: string | null;
+          token?: string;
+          status?: WorkspaceInviteStatus;
+          expires_at?: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["workspace_invites"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "workspace_invites_workspace_id_fkey";
+            columns: ["workspace_id"];
+            isOneToOne: false;
+            referencedRelation: "workspaces";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       activities: {
         Row: {
           id: string;
@@ -180,7 +216,26 @@ export interface Database {
       };
       list_workspace_members: {
         Args: { target_workspace_id: string };
-        Returns: { user_id: string; email: string }[];
+        Returns: { user_id: string; email: string; role: WorkspaceRole }[];
+      };
+      create_workspace_invite: {
+        Args: { target_workspace_id: string; invite_email: string; invite_role?: WorkspaceRole };
+        Returns: Database["public"]["Tables"]["workspace_invites"]["Row"];
+      };
+      get_invite_by_token: {
+        Args: { invite_token: string };
+        Returns: {
+          workspace_name: string;
+          workspace_slug: string;
+          email: string;
+          role: WorkspaceRole;
+          status: WorkspaceInviteStatus;
+          expires_at: string;
+        }[];
+      };
+      accept_workspace_invite: {
+        Args: { invite_token: string };
+        Returns: Database["public"]["Tables"]["workspace_members"]["Row"];
       };
     };
   };

@@ -8,7 +8,13 @@ export const metadata: Metadata = {
   title: "Entrar | VibeFlow CRM",
 };
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect?: string }>;
+}) {
+  const { redirect } = await searchParams;
+
   return (
     <AuthCard
       title="Bem-vindo de volta"
@@ -16,13 +22,16 @@ export default function LoginPage() {
       footer={
         <>
           Ainda não tem uma conta?{" "}
-          <Link href="/signup" className="font-medium text-primary underline-offset-4 hover:underline">
+          <Link
+            href={redirect ? `/signup?redirect=${encodeURIComponent(redirect)}` : "/signup"}
+            className="font-medium text-primary underline-offset-4 hover:underline"
+          >
             Criar conta
           </Link>
         </>
       }
     >
-      <LoginForm />
+      <LoginForm redirectTo={redirect} />
     </AuthCard>
   );
 }

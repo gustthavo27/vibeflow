@@ -14,12 +14,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { mockCurrentUser } from "@/lib/mock-data";
 import { createClient } from "@/lib/supabase/client";
+import type { CurrentUser } from "@/lib/workspace";
 
-function UserMenu({ variant = "topbar" }: { variant?: "topbar" | "sidebar" }) {
+function UserMenu({
+  variant = "topbar",
+  currentUser,
+}: {
+  variant?: "topbar" | "sidebar";
+  currentUser: CurrentUser;
+}) {
   const router = useRouter();
-  const firstName = mockCurrentUser.name.split(" ")[0];
+  const firstName = currentUser.name.split(" ")[0];
 
   async function handleLogout() {
     const supabase = createClient();
@@ -41,7 +47,7 @@ function UserMenu({ variant = "topbar" }: { variant?: "topbar" | "sidebar" }) {
       >
         <Avatar size="sm">
           <AvatarFallback className="bg-primary/15 font-medium text-primary">
-            {mockCurrentUser.initials}
+            {currentUser.initials}
           </AvatarFallback>
         </Avatar>
         {variant === "topbar" && (
@@ -50,10 +56,10 @@ function UserMenu({ variant = "topbar" }: { variant?: "topbar" | "sidebar" }) {
         {variant === "sidebar" && (
           <span className="flex min-w-0 flex-1 flex-col">
             <span className="truncate text-sm font-medium text-sidebar-foreground">
-              {mockCurrentUser.name}
+              {currentUser.name}
             </span>
             <span className="truncate text-xs text-sidebar-foreground/50">
-              {mockCurrentUser.email}
+              {currentUser.email}
             </span>
           </span>
         )}
@@ -67,9 +73,9 @@ function UserMenu({ variant = "topbar" }: { variant?: "topbar" | "sidebar" }) {
       <DropdownMenuContent align={variant === "sidebar" ? "start" : "end"} className="w-56">
         <DropdownMenuGroup>
           <DropdownMenuLabel className="flex flex-col gap-0.5 py-1.5">
-            <span className="text-sm font-medium text-foreground">{mockCurrentUser.name}</span>
+            <span className="text-sm font-medium text-foreground">{currentUser.name}</span>
             <span className="truncate text-xs font-normal text-muted-foreground">
-              {mockCurrentUser.email}
+              {currentUser.email}
             </span>
           </DropdownMenuLabel>
         </DropdownMenuGroup>

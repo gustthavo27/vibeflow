@@ -1,4 +1,4 @@
-import type { ActivityType, DealStage, LeadStatus } from "@/lib/supabase/types";
+import type { ActivityType, DealStage, LeadStatus, WorkspaceRole } from "@/lib/supabase/types";
 
 export const LEAD_STATUS_OPTIONS: LeadStatus[] = [
   "novo",
@@ -46,3 +46,12 @@ export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
   reuniao: "Reunião",
   nota: "Nota",
 };
+
+export const WORKSPACE_ROLE_OPTIONS: WorkspaceRole[] = ["admin", "member"];
+
+export const WORKSPACE_ROLE_LABELS: Record<WorkspaceRole, string> = {
+  admin: "Administrador",
+  member: "Membro",
+};
+
+export const FREE_PLAN_MEMBER_LIMIT = 2;

@@ -187,12 +187,13 @@
 **Objetivo**: Implementar a lógica completa de multi-workspace, convites e papéis de acesso.
 
 **Entregas**:
-- [ ] Criação de múltiplos workspaces por usuário
-- [ ] Convite de colaboradores por e-mail via Resend
-- [ ] Aceite de convite e vínculo ao workspace
-- [ ] Papéis Admin/Membro aplicados nas Server Actions e RLS
-- [ ] Troca de workspace funcional (Milestone 1) com dados reais
-- [ ] Gerenciamento de colaboradores (listar, remover, alterar papel)
+- [x] Criação de múltiplos workspaces por usuário
+- [x] Convite de colaboradores por e-mail via Resend
+- [x] Aceite de convite e vínculo ao workspace
+- [x] Papéis Admin/Membro aplicados nas Server Actions e RLS
+- [x] Troca de workspace funcional (Milestone 1) com dados reais
+- [x] Gerenciamento de colaboradores (listar, remover, alterar papel)
+- [x] Limite de 2 membros no plano Free (aplicado na criação e no aceite do convite)
 
 **Commit final**: `feat: multi-empresa com convites por e-mail, papéis de acesso e troca de workspace`
 

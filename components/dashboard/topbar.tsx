@@ -4,6 +4,7 @@ import { Bell, Menu } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
+import type { CurrentUser } from "@/lib/workspace";
 import { navItems } from "./nav-items";
 import { UserMenu } from "./user-menu";
 
@@ -18,7 +19,15 @@ function useCurrentPageTitle(workspace: string) {
   return activeItem?.label ?? "Dashboard";
 }
 
-function Topbar({ workspace, onOpenNav }: { workspace: string; onOpenNav: () => void }) {
+function Topbar({
+  workspace,
+  currentUser,
+  onOpenNav,
+}: {
+  workspace: string;
+  currentUser: CurrentUser;
+  onOpenNav: () => void;
+}) {
   const title = useCurrentPageTitle(workspace);
 
   return (
@@ -42,7 +51,7 @@ function Topbar({ workspace, onOpenNav }: { workspace: string; onOpenNav: () => 
           <Bell className="size-4.5" />
           <span className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-primary" />
         </Button>
-        <UserMenu variant="topbar" />
+        <UserMenu variant="topbar" currentUser={currentUser} />
       </div>
     </header>
   );
