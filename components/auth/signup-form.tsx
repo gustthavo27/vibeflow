@@ -24,7 +24,7 @@ type FormErrors = {
   form?: string;
 };
 
-function SignupForm() {
+function SignupForm({ redirectTo }: { redirectTo?: string }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -69,7 +69,7 @@ function SignupForm() {
       return;
     }
 
-    router.push("/onboarding");
+    router.push(redirectTo ?? "/onboarding");
     router.refresh();
   }
 

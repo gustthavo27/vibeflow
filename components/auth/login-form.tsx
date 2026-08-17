@@ -18,7 +18,7 @@ type FormErrors = {
   form?: string;
 };
 
-function LoginForm() {
+function LoginForm({ redirectTo }: { redirectTo?: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,6 +44,12 @@ function LoginForm() {
     if (error || !data.user) {
       setErrors({ form: translateAuthError(error?.message ?? "") });
       setIsSubmitting(false);
+      return;
+    }
+
+    if (redirectTo) {
+      router.push(redirectTo);
+      router.refresh();
       return;
     }
 
