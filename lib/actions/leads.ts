@@ -148,6 +148,12 @@ export async function createLead(
     .single();
 
   if (error || !data) {
+    if (error?.message.includes("plan_lead_limit")) {
+      return {
+        success: false,
+        error: "O plano Free permite no máximo 50 leads. Faça upgrade para o plano Pro para cadastrar mais.",
+      };
+    }
     return { success: false, error: "Não foi possível cadastrar o lead." };
   }
 

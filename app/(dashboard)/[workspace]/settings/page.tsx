@@ -1,3 +1,4 @@
+import { BillingView } from "@/components/settings/billing-view";
 import { CollaboratorsView } from "@/components/settings/collaborators-view";
 import { listInvites } from "@/lib/actions/invites";
 import { listMembers } from "@/lib/actions/members";
@@ -34,6 +35,8 @@ export default async function SettingsPage({
           Workspace, colaboradores e plano de assinatura.
         </p>
       </div>
+
+      <BillingView workspace={workspace} plan={workspaceRow.plan} isAdmin={isAdmin} />
 
       <CollaboratorsView
         workspace={workspace}
