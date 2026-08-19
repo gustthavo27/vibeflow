@@ -206,12 +206,12 @@
 **Objetivo**: Implementar os planos Free/Pro, checkout e gestão de assinatura.
 
 **Entregas**:
-- [ ] Configuração dos produtos/preços no Stripe (Free, Pro R$49/mês)
-- [ ] Checkout via Stripe Checkout
-- [ ] Webhook para ativar/desativar plano automaticamente
-- [ ] Customer Portal do Stripe para gerenciamento de assinatura
-- [ ] Limites de plano aplicados (2 colaboradores/50 leads no Free)
-- [ ] Tela de planos e upgrade dentro do app
+- [x] Configuração dos produtos/preços no Stripe (Free, Pro R$49/mês)
+- [x] Checkout via Stripe Checkout
+- [x] Webhook para ativar/desativar plano automaticamente
+- [x] Customer Portal do Stripe para gerenciamento de assinatura
+- [x] Limites de plano aplicados (2 colaboradores/50 leads no Free)
+- [x] Tela de planos e upgrade dentro do app
 
 **Commit final**: `feat: monetização via Stripe com checkout, webhooks e limites de plano`
 
