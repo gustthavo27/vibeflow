@@ -91,6 +91,22 @@ describe("createLead", () => {
     expect(result.success).toBe(false);
   });
 
+  it("translates the plan_lead_limit error from the insert trigger", async () => {
+    const supabase = createSupabaseMock();
+    const insertBuilder = makeQueryBuilder({ data: null, error: { message: "plan_lead_limit" } });
+    supabase.from.mockImplementation((table: string) => {
+      if (table === "workspaces") return workspaceFoundBuilder();
+      if (table === "leads") return insertBuilder;
+      throw new Error(`unexpected table ${table}`);
+    });
+    mockedCreateClient.mockResolvedValue(supabase as never);
+
+    const result = await createLead("acme", validInput);
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toMatch(/50 leads/i);
+  });
+
   it("creates a lead on success and issues an insert", async () => {
     const supabase = createSupabaseMock();
     const insertBuilder = makeQueryBuilder({ data: { id: "lead-1", ...validInput }, error: null });

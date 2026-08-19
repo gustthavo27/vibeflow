@@ -6,6 +6,7 @@ import { sendWorkspaceInviteEmail } from "@/lib/email/invite";
 import { createClient } from "@/lib/supabase/server";
 import type { Database, WorkspaceInviteStatus, WorkspaceRole } from "@/lib/supabase/types";
 import type { ActionResult } from "@/lib/actions/types";
+import { canAddMember } from "@/lib/limits";
 import { validateEmail } from "@/lib/validation/auth";
 import { getWorkspaceBySlug, resolveWorkspaceId } from "@/lib/workspace";
 
@@ -76,6 +77,17 @@ export async function createInvite(
       success: false,
       error: "Verifique os campos do formulário.",
       fieldErrors: { email: emailError },
+    };
+  }
+
+  // Pré-check só para feedback rápido: não desconta o convite atual quando é
+  // uma renovação para o mesmo e-mail (a função `create_workspace_invite` no
+  // banco trata esse caso e continua sendo a fonte de verdade).
+  const memberLimit = await canAddMember(workspaceId, email);
+  if (!memberLimit.allowed) {
+    return {
+      success: false,
+      error: "O plano Free permite no máximo 2 membros. Faça upgrade para o plano Pro para convidar mais colaboradores.",
     };
   }
 

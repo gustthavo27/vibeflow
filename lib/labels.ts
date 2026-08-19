@@ -55,3 +55,4 @@ export const WORKSPACE_ROLE_LABELS: Record<WorkspaceRole, string> = {
 };
 
 export const FREE_PLAN_MEMBER_LIMIT = 2;
+export const FREE_PLAN_LEAD_LIMIT = 50;

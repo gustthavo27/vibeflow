@@ -33,6 +33,9 @@ export interface Database {
           name: string;
           slug: string;
           plan: "free" | "pro";
+          stripe_customer_id: string | null;
+          stripe_subscription_id: string | null;
+          subscription_status: string | null;
           created_by: string;
           created_at: string;
           updated_at: string;
@@ -42,6 +45,9 @@ export interface Database {
           name: string;
           slug: string;
           plan?: "free" | "pro";
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          subscription_status?: string | null;
           created_by: string;
           created_at?: string;
           updated_at?: string;

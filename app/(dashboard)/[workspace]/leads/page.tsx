@@ -20,6 +20,7 @@ export default async function LeadsPage({
       workspace={workspace}
       initialLeads={leadsResult.success ? leadsResult.data : []}
       members={members}
+      plan={workspaceRow.plan}
     />
   );
 }
