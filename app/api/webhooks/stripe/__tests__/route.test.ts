@@ -99,4 +99,24 @@ describe("POST /api/webhooks/stripe", () => {
     );
     expect(workspacesChain.eq).toHaveBeenCalledWith("stripe_customer_id", "cus_123");
   });
+
+  it("marks the subscription as payment_failed on invoice.payment_failed", async () => {
+    const workspacesChain = makeUpdateChain();
+    const admin = { from: vi.fn(() => workspacesChain) };
+    mockedCreateAdminClient.mockReturnValue(admin as never);
+
+    const constructEvent = vi.fn().mockReturnValue({
+      type: "invoice.payment_failed",
+      data: { object: { customer: "cus_123" } },
+    });
+    mockedGetStripeClient.mockReturnValue({ webhooks: { constructEvent } } as never);
+
+    const response = await POST(makeRequest("{}"));
+
+    expect(response.status).toBe(200);
+    expect(workspacesChain.update).toHaveBeenCalledWith(
+      expect.objectContaining({ subscription_status: "payment_failed" }),
+    );
+    expect(workspacesChain.eq).toHaveBeenCalledWith("stripe_customer_id", "cus_123");
+  });
 });

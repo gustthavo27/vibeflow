@@ -34,6 +34,7 @@ export async function createCheckoutSession(workspaceSlug: string): Promise<Acti
 
   const { data: userData } = await supabase.auth.getUser();
   const appUrl = getAppUrl();
+  const userId = userData.user?.id;
 
   try {
     const stripe = getStripeClient();
@@ -43,8 +44,8 @@ export async function createCheckoutSession(workspaceSlug: string): Promise<Acti
       client_reference_id: workspaceId,
       customer: workspace.stripe_customer_id ?? undefined,
       customer_email: workspace.stripe_customer_id ? undefined : userData.user?.email,
-      metadata: { workspace_id: workspaceId },
-      subscription_data: { metadata: { workspace_id: workspaceId } },
+      metadata: { workspace_id: workspaceId, user_id: userId ?? "" },
+      subscription_data: { metadata: { workspace_id: workspaceId, user_id: userId ?? "" } },
       success_url: `${appUrl}/${workspaceSlug}/settings?checkout=success`,
       cancel_url: `${appUrl}/${workspaceSlug}/settings?checkout=cancelled`,
     });

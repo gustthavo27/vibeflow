@@ -106,6 +106,7 @@ describe("createInvite", () => {
     const invitesBuilder = makeQueryBuilder({ error: null });
     supabase.from.mockImplementation((table: string) => {
       if (table === "workspaces") return workspaceRowBuilder();
+      if (table === "workspace_members") return makeQueryBuilder({ error: null });
       if (table === "workspace_invites") return invitesBuilder;
       throw new Error(`unexpected table ${table}`);
     });

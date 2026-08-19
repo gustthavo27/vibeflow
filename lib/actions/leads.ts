@@ -11,6 +11,7 @@ import {
   validateLeadPhone,
 } from "@/lib/validation/leads";
 import type { ActionResult } from "@/lib/actions/types";
+import { canAddLead } from "@/lib/limits";
 import { resolveWorkspaceId } from "@/lib/workspace";
 
 type LeadRow = Database["public"]["Tables"]["leads"]["Row"];
@@ -128,6 +129,14 @@ export async function createLead(
   const fieldErrors = validateLeadInput(input);
   if (Object.keys(fieldErrors).length > 0) {
     return { success: false, error: "Verifique os campos do formulário.", fieldErrors };
+  }
+
+  const leadLimit = await canAddLead(workspaceId);
+  if (!leadLimit.allowed) {
+    return {
+      success: false,
+      error: "O plano Free permite no máximo 50 leads. Faça upgrade para o plano Pro para cadastrar mais.",
+    };
   }
 
   const { data, error } = await supabase

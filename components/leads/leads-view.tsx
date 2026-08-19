@@ -17,7 +17,7 @@ import { DeleteLeadDialog } from "@/components/leads/delete-lead-dialog";
 import { LeadFormDialog, type LeadFormValues } from "@/components/leads/lead-form-dialog";
 import { LeadsTable } from "@/components/leads/leads-table";
 import { createLead, deleteLead, listLeads, updateLead } from "@/lib/actions/leads";
-import { LEAD_STATUS_LABELS, LEAD_STATUS_OPTIONS } from "@/lib/labels";
+import { FREE_PLAN_LEAD_LIMIT, LEAD_STATUS_LABELS, LEAD_STATUS_OPTIONS } from "@/lib/labels";
 import type { Database, LeadStatus } from "@/lib/supabase/types";
 import type { WorkspaceMember } from "@/lib/workspace";
 
@@ -29,10 +29,12 @@ function LeadsView({
   workspace,
   initialLeads,
   members,
+  plan,
 }: {
   workspace: string;
   initialLeads: Lead[];
   members: WorkspaceMember[];
+  plan: "free" | "pro";
 }) {
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
   const [search, setSearch] = useState("");
@@ -49,6 +51,8 @@ function LeadsView({
     () => new Map(members.map((member) => [member.user_id, member])),
     [members],
   );
+
+  const atLeadLimit = plan === "free" && leads.length >= FREE_PLAN_LEAD_LIMIT;
 
   useEffect(() => {
     const handle = setTimeout(() => {
@@ -121,11 +125,18 @@ function LeadsView({
             Gerencie contatos e oportunidades do workspace.
           </p>
         </div>
-        <Button onClick={openCreateForm}>
+        <Button onClick={openCreateForm} disabled={atLeadLimit}>
           <Plus />
           Novo lead
         </Button>
       </div>
+
+      {atLeadLimit && (
+        <p className="text-sm text-muted-foreground">
+          O plano Free permite no máximo {FREE_PLAN_LEAD_LIMIT} leads. Faça upgrade para o plano Pro
+          para cadastrar mais.
+        </p>
+      )}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1 sm:max-w-xs">

@@ -107,7 +107,7 @@ describe("createCheckoutSession", () => {
       expect.objectContaining({
         mode: "subscription",
         client_reference_id: "workspace-1",
-        metadata: { workspace_id: "workspace-1" },
+        metadata: { workspace_id: "workspace-1", user_id: "user-1" },
       }),
     );
   });
